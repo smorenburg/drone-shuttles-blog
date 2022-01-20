@@ -1,1 +1,1 @@
-# nordcloud-ghost
+# Nordcloud Ghost
