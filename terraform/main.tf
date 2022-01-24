@@ -226,81 +226,89 @@ resource "google_sql_database" "ghost" {
   instance = google_sql_database_instance.mysql_master.name
 }
 
-locals {
-  cloud_config = "./assets/cloud-config.yaml"
-}
+#locals {
+#  vars = {
+#    sql_proxy_version    = "1.28.0"
+#    sql_proxy_instances  = google_sql_database_instance.mysql_master.connection_name
+#    ghost_version        = "0.0.7"
+#    ghost_content_bucket = google_storage_bucket.content.name
+#  }
+#
+#  template = templatefile("./assets/cloud-config.yaml", vars)
+#}
 
-data "template_file" "cloud_config" {
-  template = file(local.cloud_config)
+#data "template_file" "cloud_config" {
+#  template = file(local.cloud_config)
+#
+#  vars = {
+#    sql_proxy_version    = "1.28.0"
+#    sql_proxy_instances  = google_sql_database_instance.mysql_master.connection_name
+#    ghost_version        = "0.0.7"
+#    ghost_content_bucket = google_storage_bucket.content.name
+#  }
+#}
+#
+#data "template_cloudinit_config" "default" {
+#  gzip          = false
+#  base64_encode = false
+#
+#  part {
+#    filename     = "init.cfg"
+#    content_type = "text/cloud-config"
+#    content      = data.template_file.cloud_config.rendered
+#  }
+#}
 
-  vars = {
-    sql_proxy_version    = "1.28.0"
-    sql_proxy_instances  = google_sql_database_instance.mysql_master.connection_name
-    ghost_version        = "0.0.7"
-    ghost_content_bucket = google_storage_bucket.content.name
-  }
-}
-
-data "template_cloudinit_config" "default" {
-  gzip          = false
-  base64_encode = false
-
-  part {
-    filename     = "init.cfg"
-    content_type = "text/cloud-config"
-    content      = data.template_file.cloud_config.rendered
-  }
-}
-
-resource "google_project_iam_member" "ghost_editor" {
-  project = var.project_id
-  role    = "roles/editor"
-  member  = "serviceAccount:${google_service_account.ghost.email}"
-}
-
-resource "google_compute_instance" "instance" {
-  name                      = "ghost-${random_id.suffix.hex}"
-  machine_type              = "e2-medium"
-  zone                      = "europe-west4-b"
-  allow_stopping_for_update = true
-  tags                      = ["iap", "http-server"]
-
-  scheduling {
-    automatic_restart   = true
-    on_host_maintenance = "MIGRATE"
-  }
-
-  boot_disk {
-    initialize_params {
-      image = "cos-cloud/cos-stable"
-      type  = "pd-ssd"
-    }
-  }
-
-  network_interface {
-    network    = google_compute_network.vpc_network.id
-    subnetwork = google_compute_subnetwork.default.name
-
-    access_config {
-      network_tier = "PREMIUM"
-    }
-  }
-
-  shielded_instance_config {
-    enable_secure_boot          = true
-    enable_integrity_monitoring = true
-    enable_vtpm                 = true
-  }
-
-  metadata = {
-    block-project-ssh-keys = true
-    enable-oslogin         = true
-    google-logging-enabled = true
-    user-data              = data.template_cloudinit_config.default.rendered
-  }
-
-  service_account {
-    email  = google_service_account.ghost.email
-    scopes = ["cloud-platform"]
-  }
-}
+#resource "google_project_iam_member" "ghost_editor" {
+#  project = var.project_id
+#  role    = "roles/editor"
+#  member  = "serviceAccount:${google_service_account.ghost.email}"
+#}
+#
+#resource "google_compute_instance" "instance" {
+#  name                      = "ghost-${random_id.suffix.hex}"
+#  machine_type              = "e2-medium"
+#  zone                      = "europe-west4-b"
+#  allow_stopping_for_update = true
+#  tags                      = ["iap", "http-server"]
+#
+#  scheduling {
+#    automatic_restart   = true
+#    on_host_maintenance = "MIGRATE"
+#  }
+#
+#  boot_disk {
+#    initialize_params {
+#      image = "cos-cloud/cos-stable"
+#      type  = "pd-ssd"
+#    }
+#  }
+#
+#  network_interface {
+#    network    = google_compute_network.vpc_network.id
+#    subnetwork = google_compute_subnetwork.default.name
+#
+#    access_config {
+#      network_tier = "PREMIUM"
+#    }
+#  }
+#
+#  shielded_instance_config {
+#    enable_secure_boot          = true
+#    enable_integrity_monitoring = true
+#    enable_vtpm                 = true
+#  }
+#
+#  metadata = {
+#    block-project-ssh-keys = true
+#    enable-oslogin         = true
+#    google-logging-enabled = true
+##    user-data              = local.template
+##    user-data              = data.template_cloudinit_config.default.rendered
+#  }
+#
+#  service_account {
+#    email  = google_service_account.ghost.email
+#    scopes = ["cloud-platform"]
+#  }
+#}
