@@ -259,7 +259,7 @@ resource "google_project_iam_member" "ghost_editor" {
 }
 
 resource "google_compute_instance" "instance" {
-  name                      = "ghost-${random_id.suffix}"
+  name                      = "ghost-${random_id.suffix.hex}"
   machine_type              = "e2-medium"
   zone                      = "europe-west4-b"
   allow_stopping_for_update = true
