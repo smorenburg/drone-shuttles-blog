@@ -1,0 +1,12 @@
+steps:
+  - id: 'Run terraform init'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-tfstate']
+
+  - id: 'Run terraform destroy'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: ['-c', 'terraform destroy -auto-approve -var=project_id=${PROJECT_ID}']
