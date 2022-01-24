@@ -234,9 +234,9 @@ data "template_file" "cloud_config" {
   template = file(local.cloud_config)
 
   vars = {
-    sql_proxy_version = "1.28.0"
-    sql_proxy_instances = google_sql_database_instance.mysql_master.connection_name
-    ghost_version = "0.0.7"
+    sql_proxy_version    = "1.28.0"
+    sql_proxy_instances  = google_sql_database_instance.mysql_master.connection_name
+    ghost_version        = "0.0.7"
     ghost_content_bucket = google_storage_bucket.content.name
   }
 }
@@ -253,8 +253,9 @@ data "template_cloudinit_config" "default" {
 }
 
 resource "google_project_iam_member" "ghost_editor" {
-  role   = "roles/editor"
-  member = "serviceAccount:${google_service_account.ghost.email}"
+  project = var.project_id
+  role    = "roles/editor"
+  member  = "serviceAccount:${google_service_account.ghost.email}"
 }
 
 resource "google_compute_instance" "instance" {
