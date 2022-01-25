@@ -35,9 +35,7 @@ steps:
     args:
       - -c
       - |
-        if [[ '$_ENV' = "dev ]]; then
-          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
-        elseif [[ -z '$TAG_NAME' ]]; then
+        if [[ -z '$TAG_NAME' ]]; then
           gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
         else
           gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
