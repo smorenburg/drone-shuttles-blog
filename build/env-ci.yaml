@@ -24,9 +24,9 @@ steps:
       - -c
       - |
         if [[ -z '$TAG_NAME' ]]; then
-          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} .
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} -f Dockerfile
         else
-          docker build --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME} .
+          docker build --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME} -f Dockerfile
         fi
 
   - id: 'Push all tags'
