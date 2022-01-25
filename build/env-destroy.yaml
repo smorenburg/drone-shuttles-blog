@@ -1,3 +1,5 @@
+timeout: 1800s
+
 steps:
   - id: 'Run terraform init'
     name: 'hashicorp/terraform'
