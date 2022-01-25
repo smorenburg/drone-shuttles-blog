@@ -3,7 +3,7 @@ steps:
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-tfstate']
+    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
 
   - id: 'Run terraform plan'
     name: 'hashicorp/terraform'
@@ -11,8 +11,20 @@ steps:
     entrypoint: 'sh'
     args: ['-c', 'terraform plan -out=tf.plan -var=project_id=${PROJECT_ID}']
 
-  - id: 'Push tf.plan to the build storage bucket'
+  - id: 'Push tf.plan to the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'sh'
     args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/tf.plan']
+
+  - id: 'Run cd trigger'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud beta builds triggers run ${_ENV}-cd --sha ${COMMIT_SHA}
+        else
+          gcloud beta builds triggers run ${_ENV}-cd --tag ${TAG_NAME}
+        fi

@@ -3,9 +3,9 @@ steps:
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-tfstate']
+    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
 
-  - id: 'Pull tf.plan from the build storage bucket'
+  - id: 'Pull tf.plan from the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'sh'
