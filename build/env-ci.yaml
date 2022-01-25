@@ -29,37 +29,16 @@ steps:
           gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME}
         fi
 
-#  - id: 'Push all tags'
-#    name: 'gcr.io/cloud-builders/docker'
-#    entrypoint: 'sh'
-#    args: [ '-c', 'docker push --all-tags' ]
-
-#  - id: 'Tag ghost image with latest'
-#    name: 'gcr.io/cloud-builders/gcloud'
-#    entrypoint: 'bash'
-#    args:
-#      - -c
-#      - |
-#        if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
-#        export _REGISTRY=release
-#        else
-#        export _REGISTRY=$_ENV
-#        fi
-#
-#        if [[ -z '$TAG_NAME' ]]; then
-#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-#        else
-#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-#        fi
-
   - id: 'Run plan trigger'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - -c
       - |
-        if [[ -z '$TAG_NAME' ]]; then
-          gcloud beta builds triggers run ${_ENV}-plan --sha ${SHORT_SHA}
+        if [[ '$_ENV' = "dev ]]; then
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
+        elseif [[ -z '$TAG_NAME' ]]; then
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
         else
-          gcloud beta builds triggers run ${_ENV}-plan --sha ${TAG_NAME}
+          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
         fi
