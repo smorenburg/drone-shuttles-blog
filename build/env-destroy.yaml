@@ -3,7 +3,7 @@ steps:
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-tfstate']
+    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
 
   - id: 'Run terraform destroy'
     name: 'hashicorp/terraform'
