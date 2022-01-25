@@ -26,13 +26,13 @@ steps:
         if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
           export _REGISTRY=release
         else
-          export _REGISTRY=$_ENV
+          export _REGISTRY=${_ENV}
         fi
         
         if [[ -z '$TAG_NAME' ]]; then
-          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/$_REGISTRY/ghost:${SHORT_SHA} --tag europe-docker.pkg.dev/${PROJECT_ID}/$_REGISTRY/ghost:latest .
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} .
         else
-          docker build --tag europe-docker.pkg.dev/app1-shared-cicd/$_REGISTRY/ghost:${TAG_NAME} --tag europe-docker.pkg.dev/app1-shared-cicd/$_REGISTRY/ghost:latest .Dockerfile
+          docker build --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME} .
         fi
 
   - id: 'Push all tags'
