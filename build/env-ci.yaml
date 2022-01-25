@@ -17,22 +17,22 @@ steps:
     args: [ '-c', 'terraform validate' ]
 
   - id: 'Build ghost image'
-    name: 'gcr.io/cloud-builders/docker'
+    name: 'gcr.io/cloud-builders/gcloud'
     dir: 'src/ghost'
     entrypoint: 'bash'
     args:
       - -c
       - |
         if [[ -z '$TAG_NAME' ]]; then
-          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} -f Dockerfile
+          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA}
         else
-          docker build --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME} -f Dockerfile
+          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME}
         fi
 
-  - id: 'Push all tags'
-    name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'sh'
-    args: [ '-c', 'docker push --all-tags' ]
+#  - id: 'Push all tags'
+#    name: 'gcr.io/cloud-builders/docker'
+#    entrypoint: 'sh'
+#    args: [ '-c', 'docker push --all-tags' ]
 
 #  - id: 'Tag ghost image with latest'
 #    name: 'gcr.io/cloud-builders/gcloud'
