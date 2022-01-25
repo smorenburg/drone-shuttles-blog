@@ -4,11 +4,15 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.0"
+      version = "4.7.0"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.0"
+      version = "4.7.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.1.0"
     }
   }
 
@@ -31,7 +35,9 @@ locals {
 
   # Render the cloud-init cloud-config YAML template using variables.
   cloud_config = templatefile("./templates/cloud-config.yaml", local.vars)
+
   vars = {
+    project_id           = var.project_id
     registry             = var.env == "stage" || var.env == "prod" ? "release" : var.env
     sql_proxy_version    = "1.28.0"
     sql_proxy_instances  = google_sql_database_instance.master.connection_name
