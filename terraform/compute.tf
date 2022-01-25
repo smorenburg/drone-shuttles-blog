@@ -119,6 +119,8 @@ resource "google_project_iam_member" "ghost_sql_client" {
   member  = "serviceAccount:${google_service_account.ghost.email}"
 }
 
+// TODO: Add Logs Writer permissions.
+
 # Creat the instance template.
 resource "google_compute_instance_template" "ghost" {
   name_prefix  = "${var.env}-ghost-${random_id.suffix.hex}-template-"
@@ -196,14 +198,6 @@ resource "google_compute_region_instance_group_manager" "ghost" {
     health_check      = google_compute_health_check.ghost.id
     initial_delay_sec = 180
   }
-
-  depends_on = [
-    google_sql_database.ghost,
-    google_sql_user.ghost,
-    google_project_iam_member.ghost_sql_client,
-    google_project_iam_member.ghost_registry_reader,
-    google_storage_bucket_iam_member.ghost_object_creator
-  ]
 }
 
 # Create the global load balancer.
@@ -271,6 +265,4 @@ resource "google_compute_managed_ssl_certificate" "ghost" {
   managed {
     domains = [local.domain]
   }
-
-  depends_on = [google_compute_url_map.ghost]
 }
