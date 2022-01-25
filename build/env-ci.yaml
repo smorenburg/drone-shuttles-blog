@@ -30,9 +30,9 @@ steps:
         fi
         
         if [[ -z '$TAG_NAME' ]]; then
-          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/$_REGISTRY/ghost:${SHORT_SHA}
+          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/$_REGISTRY/ghost:${SHORT_SHA} --file .Dockerfile
         else
-          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/$_REGISTRY/ghost:${TAG_NAME}
+          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/$_REGISTRY/ghost:${TAG_NAME} --file .Dockerfile
         fi
 
   - id: 'Tag ghost image with latest'
