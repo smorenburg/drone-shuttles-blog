@@ -30,9 +30,9 @@ steps:
         fi
         
         if [[ -z '$TAG_NAME' ]]; then
-          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${SHORT_SHA}
+          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/$REGISTRY/ghost:${SHORT_SHA}
         else
-          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/${REGISTRY}/ghost:${TAG_NAME}
+          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/$REGISTRY/ghost:${TAG_NAME}
         fi
 
   - id: 'Tag ghost image with latest'
@@ -48,9 +48,9 @@ steps:
         fi
         
         if [[ -z '$TAG_NAME' ]]; then
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/$REGISTRY/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
         else
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/$REGISTRY/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
         fi
 
   - id: 'Run plan trigger'
