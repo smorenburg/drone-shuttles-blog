@@ -11,7 +11,7 @@ steps:
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'gsutil cp gs://${PROJECT_ID}-builds/tf.plan tf.plan']
+    args: ['-c', 'gsutil cp gs://${PROJECT_ID}-builds/${_ENV}.tf.plan tf.plan']
 
   - id: 'Run terraform apply'
     name: 'hashicorp/terraform'

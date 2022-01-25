@@ -15,7 +15,7 @@ steps:
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/tf.plan']
+    args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/${_ENV}.tf.plan']
 
   - id: 'Run cd trigger'
     name: 'gcr.io/cloud-builders/gcloud'
