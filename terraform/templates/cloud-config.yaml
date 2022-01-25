@@ -46,7 +46,7 @@ write_files:
       Restart=always
       ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries europe-docker.pkg.dev
       ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries europe-docker.pkg.dev
-      ExecStart=/usr/bin/docker run --name ghost --net host -e storage__gcs__bucket=${ghost_content_bucket} europe-docker.pkg.dev/blog-dev-339207/ghost/ghost:${ghost_version}
+      ExecStart=/usr/bin/docker run --name ghost --net host -e storage__gcs__bucket=${ghost_content_bucket} -e url=${ghost_url} europe-docker.pkg.dev/blog-dev-339207/${registry}/ghost:${ghost_version}
       ExecStop=/usr/bin/docker stop ghost
       ExecStopPost=/usr/bin/docker rm -v ghost
       ExecStopPost=/usr/bin/docker image rm europe-docker.pkg.dev/blog-dev-339207/ghost/ghost:${ghost_version}
