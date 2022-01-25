@@ -85,15 +85,6 @@ resource "google_compute_router_nat" "vpc_router_nat" {
   }
 }
 
-# Create the SSL certificate.
-resource "google_compute_managed_ssl_certificate" "ghost" {
-  name = "${var.env}-ghost-${random_id.suffix.hex}-certificate"
-
-  managed {
-    domains = [local.domain]
-  }
-}
-
 # Create the health check.
 resource "google_compute_health_check" "ghost" {
   name                = "${var.env}-ghost-${random_id.suffix.hex}-health-check"
@@ -109,64 +100,6 @@ resource "google_compute_health_check" "ghost" {
   log_config {
     enable = true
   }
-}
-
-# Create the global load balancer.
-resource "google_compute_global_address" "ghost" {
-  name = "${var.env}-ghost-${random_id.suffix.hex}-address"
-}
-
-resource "google_compute_backend_service" "ghost" {
-  name                   = "${var.env}-ghost-${random_id.suffix.hex}-backend-service"
-  load_balancing_scheme  = "EXTERNAL"
-  enable_cdn             = true
-  health_checks          = [google_compute_health_check.ghost.id]
-  port_name              = "http"
-  custom_request_headers = ["X-Forwarded-Proto: https", "Host: ${local.domain}"]
-
-  backend {
-    group = google_compute_region_instance_group_manager.ghost.instance_group
-  }
-}
-
-resource "google_compute_url_map" "ghost" {
-  name            = "${var.env}-ghost-${random_id.suffix.hex}-url-map"
-  default_service = google_compute_backend_service.ghost.id
-}
-
-resource "google_compute_target_https_proxy" "ghost" {
-  name             = "${var.env}-ghost-${random_id.suffix.hex}-https-proxy"
-  url_map          = google_compute_url_map.ghost.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.ghost.id]
-}
-
-resource "google_compute_global_forwarding_rule" "ghost" {
-  name       = "${var.env}-ghost-${random_id.suffix.hex}-forwarding-rule"
-  target     = google_compute_target_https_proxy.ghost.id
-  port_range = 443
-  ip_address = google_compute_global_address.ghost.address
-}
-
-resource "google_compute_url_map" "ghost_redirect" {
-  name = "${var.env}-ghost-${random_id.suffix.hex}-url-map-redirect"
-
-  default_url_redirect {
-    redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
-    strip_query            = false
-    https_redirect         = true
-  }
-}
-
-resource "google_compute_target_http_proxy" "ghost_redirect" {
-  name    = "${var.env}-ghost-${random_id.suffix.hex}-redirect-http-proxy"
-  url_map = google_compute_url_map.ghost_redirect.self_link
-}
-
-resource "google_compute_global_forwarding_rule" "ghost_redirect" {
-  name       = "${var.env}-ghost-${random_id.suffix.hex}-redirect-forwarding-rule"
-  target     = google_compute_target_http_proxy.ghost_redirect.self_link
-  ip_address = google_compute_global_address.ghost.address
-  port_range = "80"
 }
 
 # Create the service account and set permissions.
@@ -265,8 +198,79 @@ resource "google_compute_region_instance_group_manager" "ghost" {
   }
 
   depends_on = [
+    google_sql_database.ghost,
+    google_sql_user.ghost,
     google_project_iam_member.ghost_sql_client,
     google_project_iam_member.ghost_registry_reader,
     google_storage_bucket_iam_member.ghost_object_creator
   ]
+}
+
+# Create the global load balancer.
+resource "google_compute_global_address" "ghost" {
+  name = "${var.env}-ghost-${random_id.suffix.hex}-address"
+}
+
+resource "google_compute_backend_service" "ghost" {
+  name                   = "${var.env}-ghost-${random_id.suffix.hex}-backend-service"
+  load_balancing_scheme  = "EXTERNAL"
+  enable_cdn             = true
+  health_checks          = [google_compute_health_check.ghost.id]
+  port_name              = "http"
+  custom_request_headers = ["X-Forwarded-Proto: https", "Host: ${local.domain}"]
+
+  backend {
+    group = google_compute_region_instance_group_manager.ghost.instance_group
+  }
+}
+
+resource "google_compute_url_map" "ghost" {
+  name            = "${var.env}-ghost-${random_id.suffix.hex}-url-map"
+  default_service = google_compute_backend_service.ghost.id
+}
+
+resource "google_compute_target_https_proxy" "ghost" {
+  name             = "${var.env}-ghost-${random_id.suffix.hex}-https-proxy"
+  url_map          = google_compute_url_map.ghost.id
+  ssl_certificates = [google_compute_managed_ssl_certificate.ghost.id]
+}
+
+resource "google_compute_global_forwarding_rule" "ghost" {
+  name       = "${var.env}-ghost-${random_id.suffix.hex}-forwarding-rule"
+  target     = google_compute_target_https_proxy.ghost.id
+  port_range = 443
+  ip_address = google_compute_global_address.ghost.address
+}
+
+resource "google_compute_url_map" "ghost_redirect" {
+  name = "${var.env}-ghost-${random_id.suffix.hex}-url-map-redirect"
+
+  default_url_redirect {
+    redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+    strip_query            = false
+    https_redirect         = true
+  }
+}
+
+resource "google_compute_target_http_proxy" "ghost_redirect" {
+  name    = "${var.env}-ghost-${random_id.suffix.hex}-redirect-http-proxy"
+  url_map = google_compute_url_map.ghost_redirect.self_link
+}
+
+resource "google_compute_global_forwarding_rule" "ghost_redirect" {
+  name       = "${var.env}-ghost-${random_id.suffix.hex}-redirect-forwarding-rule"
+  target     = google_compute_target_http_proxy.ghost_redirect.self_link
+  ip_address = google_compute_global_address.ghost.address
+  port_range = "80"
+}
+
+# Create the SSL certificate.
+resource "google_compute_managed_ssl_certificate" "ghost" {
+  name = "${var.env}-ghost-${random_id.suffix.hex}-certificate"
+
+  managed {
+    domains = [local.domain]
+  }
+
+  depends_on = [google_compute_url_map.ghost]
 }
