@@ -42,15 +42,15 @@ steps:
       - -c
       - |
         if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
-        export REGISTRY=release
+        export _REGISTRY=release
         else
-        export REGISTRY=$_ENV
+        export _REGISTRY=$_ENV
         fi
         
         if [[ -z '$TAG_NAME' ]]; then
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/$REGISTRY/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
         else
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/$REGISTRY/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
         fi
 
   - id: 'Run plan trigger'
