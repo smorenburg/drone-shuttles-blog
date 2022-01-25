@@ -23,12 +23,6 @@ steps:
     args:
       - -c
       - |
-        if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
-          export _REGISTRY=release
-        else
-          export _REGISTRY=${_ENV}
-        fi
-        
         if [[ -z '$TAG_NAME' ]]; then
           docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} .
         else
