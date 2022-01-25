@@ -1,0 +1,39 @@
+{
+  "url": "http://localhost:2368",
+  "server": {
+    "port": 2368,
+    "host": "0.0.0.0"
+  },
+  "database": {
+    "client": "mysql",
+    "connection": {
+      "host": "127.0.0.1",
+      "port": 3306,
+      "user": "ghost",
+      "database": "ghost"
+    }
+  },
+  "storage": {
+    "active": "gcs",
+    "gcs": {
+      "host": "storage.googleapis.com",
+      "protocol": "https",
+      "hash": true,
+      "hashAlgorithm": "sha512",
+      "hashLength": "16"
+    }
+  },
+  "mail": {
+    "transport": "Direct"
+  },
+  "logging": {
+    "transports": [
+      "file",
+      "stdout"
+    ]
+  },
+  "process": "systemd",
+  "paths": {
+    "contentPath": "/var/lib/ghost/content"
+  }
+}
