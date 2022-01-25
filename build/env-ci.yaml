@@ -1,0 +1,66 @@
+steps:
+  - id: 'Run checkov'
+    name: 'bridgecrew/checkov'
+    entrypoint: 'sh'
+    args: [ '-c', 'checkov --directory .' ]
+
+  - id: 'Run terraform init'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: [ '-c', 'terraform init -backend=false' ]
+
+  - id: 'Run terraform validate'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: [ '-c', 'terraform validate' ]
+
+  - id: 'Build ghost image'
+    name: 'gcr.io/cloud-builders/gcloud'
+    dir: 'src/ghost'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
+          export REGISTRY=release
+        else
+          export REGISTRY=$_ENV
+        fi
+        
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${SHORT_SHA}
+        else
+          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/${REGISTRY}/ghost:${TAG_NAME}
+        fi
+
+  - id: 'Tag ghost image with latest'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [ "$_ENV" = "stage" ] || [ "$_ENV" = "prod" ]; then
+        export REGISTRY=release
+        else
+        export REGISTRY=$_ENV
+        fi
+        
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+        else
+          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${REGISTRY}/ghost:latest
+        fi
+
+  - id: 'Run plan trigger'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${SHORT_SHA}
+        else
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${TAG_NAME}
+        fi
