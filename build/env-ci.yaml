@@ -1,8 +1,8 @@
 steps:
-#  - id: 'Run checkov'
-#    name: 'bridgecrew/checkov'
-#    entrypoint: 'sh'
-#    args: [ '-c', 'checkov --directory .' ]
+  - id: 'Run checkov'
+    name: 'bridgecrew/checkov'
+    entrypoint: 'sh'
+    args: [ '-c', 'checkov --directory .' ]
 
   - id: 'Run terraform init'
     name: 'hashicorp/terraform'
