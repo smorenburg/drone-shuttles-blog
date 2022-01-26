@@ -21,12 +21,12 @@ steps:
   - id: 'Push tf.plan to the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/${_ENV}.tf.plan']
 
   - id: 'Run cd trigger'
     name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args:
       - -c
       - |
