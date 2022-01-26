@@ -30,7 +30,6 @@ write_files:
       ExecStart=/usr/bin/docker run --name sql-proxy --net host gcr.io/cloudsql-docker/gce-proxy:${sql_proxy_version} /cloud_sql_proxy -instances=${sql_proxy_instances}=tcp:0.0.0.0:3306
       ExecStop=/usr/bin/docker stop sql-proxy
       ExecStopPost=/usr/bin/docker rm -v sql-proxy
-      ExecStopPost=/usr/bin/docker image rm gcr.io/cloudsql-docker/gce-proxy:${sql_proxy_version}
 
   - path: /etc/systemd/system/ghost.service
     permissions: 0644
@@ -48,7 +47,6 @@ write_files:
       ExecStart=/usr/bin/docker run --name ghost --net host -e storage__gcs__bucket=${ghost_content_bucket} -e url=${ghost_url} europe-docker.pkg.dev/${project_id}/${registry}/ghost:${ghost_version}
       ExecStop=/usr/bin/docker stop ghost
       ExecStopPost=/usr/bin/docker rm -v ghost
-      ExecStopPost=/usr/bin/docker image rm europe-docker.pkg.dev/${project_id}/ghost/ghost:${ghost_version}
 
 runcmd:
   - systemctl daemon-reload
