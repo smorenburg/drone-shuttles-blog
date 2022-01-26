@@ -119,7 +119,11 @@ resource "google_project_iam_member" "ghost_sql_client" {
   member  = "serviceAccount:${google_service_account.ghost.email}"
 }
 
-// TODO: Add Logs Writer permissions.
+resource "google_project_iam_member" "ghost_log_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.ghost.email}"
+}
 
 # Creat the instance template.
 resource "google_compute_instance_template" "ghost" {
@@ -200,6 +204,15 @@ resource "google_compute_region_instance_group_manager" "ghost" {
   }
 }
 
+# Create the SSL certificate.
+resource "google_compute_managed_ssl_certificate" "ghost" {
+  name = "${var.env}-ghost-${random_id.suffix.hex}-certificate"
+
+  managed {
+    domains = [local.domain]
+  }
+}
+
 # Create the global load balancer.
 resource "google_compute_global_address" "ghost" {
   name = "${var.env}-ghost-${random_id.suffix.hex}-address"
@@ -256,13 +269,4 @@ resource "google_compute_global_forwarding_rule" "ghost_redirect" {
   target     = google_compute_target_http_proxy.ghost_redirect.self_link
   ip_address = google_compute_global_address.ghost.address
   port_range = "80"
-}
-
-# Create the SSL certificate.
-resource "google_compute_managed_ssl_certificate" "ghost" {
-  name = "${var.env}-ghost-${random_id.suffix.hex}-certificate"
-
-  managed {
-    domains = [local.domain]
-  }
 }
