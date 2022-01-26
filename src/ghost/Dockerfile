@@ -26,3 +26,6 @@ COPY adapters ./content/adapters
 
 # Copy the themes
 COPY themes ./content/themes
+
+# checkov:skip=CKV_DOCKER_2: Health check is not necessary.
+# checkov:skip=CKV_DOCKER_3: User is defined in base image.
