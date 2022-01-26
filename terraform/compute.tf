@@ -161,7 +161,6 @@ resource "google_compute_instance_template" "ghost" {
     block-project-ssh-keys    = true
     enable-oslogin            = true
     google-logging-enabled    = true
-    google-monitoring-enabled = true
     user-data                 = local.cloud_config
   }
 
