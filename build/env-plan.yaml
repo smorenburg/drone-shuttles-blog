@@ -8,7 +8,7 @@ steps:
   - id: 'Run terraform plan'
     name: 'hashicorp/terraform'
     dir: 'terraform'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - -c
       - |
