@@ -4,15 +4,17 @@ FROM base as builder
 
 WORKDIR ${GHOST_INSTALL}
 
+# Copy the package files.
 COPY package*.json ./
 
+# Install the packages.
 RUN npm install --only=production
 
 FROM base
 
 WORKDIR ${GHOST_INSTALL}
 
-# Copy the node_module dependencies.
+# Copy the packages from builder.
 COPY --from=builder ${GHOST_INSTALL}/node_modules ./node_modules
 
 # Remove the symlink and copy the config files.
