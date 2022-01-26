@@ -1,0 +1,8 @@
+# Ignore files
+.gcloudignore
+.git
+.gitignore
+
+# Secrets
+!secrets/
+!node_modules/
