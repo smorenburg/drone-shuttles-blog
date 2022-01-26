@@ -41,7 +41,7 @@ locals {
     registry             = var.env == "stage" || var.env == "prod" ? "release" : var.env
     sql_proxy_version    = "1.28.0"
     sql_proxy_instances  = google_sql_database_instance.master.connection_name
-    ghost_version        = "0.0.4"
+    ghost_version        = var.ghost_version
     ghost_content_bucket = google_storage_bucket.content.name
     ghost_url            = "https://${local.domain}"
   }
