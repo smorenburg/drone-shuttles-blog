@@ -10,7 +10,7 @@ steps:
   - id: 'Pull tf.plan from the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args: ['-c', 'gsutil cp gs://${PROJECT_ID}-builds/${_ENV}.tf.plan tf.plan']
 
   - id: 'Run terraform apply'
