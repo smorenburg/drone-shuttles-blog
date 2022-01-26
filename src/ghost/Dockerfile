@@ -1,14 +1,26 @@
-FROM ghost:4.33.1-alpine
+FROM ghost:4.33.1-alpine as base
 
-# Copy the adapters.
-COPY adapters /var/lib/ghost/content/adapters
-RUN cd /var/lib/ghost/content/adapters/storage/gcs && \
-    npm install --silent --only=production --no-optional --no-progress
+FROM base as builder
+
+WORKDIR ${GHOST_INSTALL}
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+FROM base
+
+WORKDIR ${GHOST_INSTALL}
+
+# Copy the node_module dependencies.
+COPY --from=builder ${GHOST_INSTALL}/node_modules ./node_modules
 
 # Remove the symlink and copy the config files.
-RUN rm -f /var/lib/ghost/config.development.json
-COPY config.development.json /var/lib/ghost/config.development.json
-COPY config.production.json /var/lib/ghost/config.production.json
+RUN rm -f config.development.json
+COPY config*.json ./
+
+# Copy the adapters
+COPY adapters ./content/adapters
 
 # Copy the themes
-COPY themes /content/themes
+COPY themes ./content/themes
