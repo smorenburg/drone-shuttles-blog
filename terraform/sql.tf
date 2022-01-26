@@ -13,6 +13,10 @@ resource "google_sql_database_instance" "master" {
       enabled            = true
       binary_log_enabled = true
     }
+
+    ip_configuration {
+      require_ssl = true
+    }
   }
 }
 
@@ -25,6 +29,10 @@ resource "google_sql_database_instance" "replica" {
 
   settings {
     tier = "db-f1-micro"
+
+    ip_configuration {
+      require_ssl = true
+    }
   }
 
   replica_configuration {
