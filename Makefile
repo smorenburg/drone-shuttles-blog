@@ -1,9 +1,11 @@
 SHELL := /usr/bin/env bash
 
 GOOGLE_APPLICATION_CREDENTIALS := $(PWD)/secrets/$(KEY_FILE)
+ENV := dev
 
 define TF_VARS
--var="project_id=$(PROJECT_ID)"
+-var="project_id=$(PROJECT_ID)" \
+-var="ghost_version=0.1.2"
 endef
 
 define TF_IMPORTS
@@ -40,7 +42,7 @@ go_test:
 tf_init:
 	export GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_APPLICATION_CREDENTIALS); \
 	cd terraform; \
-	terraform init -backend-config="bucket=$(PROJECT_ID)-dev-tfstate"
+	terraform init -backend-config="bucket=$(PROJECT_ID)-$(ENV)-tfstate"
 
 # Validate the configuration files.
 .PHONY: tf_validate
