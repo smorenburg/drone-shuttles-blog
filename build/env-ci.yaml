@@ -17,35 +17,40 @@ steps:
     args: [ '-c', 'terraform validate' ]
 
   - id: 'Build ghost image'
-    name: 'gcr.io/cloud-builders/gcloud'
+    name: 'gcr.io/cloud-builders/docker'
     dir: 'src/ghost'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - -c
       - |
         if [[ -z '$TAG_NAME' ]]; then
-          gcloud builds submit --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA}
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
         else
-          gcloud builds submit --tag europe-docker.pkg.dev/app1-shared-cicd/{$_REGISTRY}/ghost:${TAG_NAME}
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
         fi
 
-  - id: 'Tag ghost image with latest'
-    name: 'gcr.io/cloud-builders/gcloud'
-    dir: 'src/nginx-proxy'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        if [[ -z '$TAG_NAME' ]]
-        then
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-        else
-          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-        fi
+  - id: 'Push ghost image'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'sh'
+    args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
+
+#  - id: 'Tag ghost image with latest'
+#    name: 'gcr.io/cloud-builders/gcloud'
+#    dir: 'src/nginx-proxy'
+#    entrypoint: 'sh'
+#    args:
+#      - -c
+#      - |
+#        if [[ -z '$TAG_NAME' ]]
+#        then
+#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
+#        else
+#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
+#        fi
 
   - id: 'Run plan trigger'
     name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - -c
       - |
