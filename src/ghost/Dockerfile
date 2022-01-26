@@ -1,14 +1,10 @@
-FROM ghost:4.32.3-alpine
+FROM ghost:4.33.1-alpine
 
 # Install the GCS adapter.
-#RUN mkdir -p /tmp/gcs ${GHOST_CONTENT}/adapters/storage/gcs && \
-#    wget -O - "$(npm view @danmasta/ghost-gcs-adapter dist.tarball)" | tar xz -C /tmp/gcs && \
-#    npm install --prefix /tmp/gcs/package --silent --only=production --no-optional --no-progress && \
-#    mv /tmp/gcs/package/* ${GHOST_CONTENT}/adapters/storage/gcs
-
-RUN mkdir -p content/adapters/storage/gcs && \
-    npm install ghost-v3-google-cloud-storage && \
-    mv node_modules/ghost-v3-google-cloud-storage/src/* content/adapters/storage/gcs/
+RUN mkdir -p /tmp/gcs ${GHOST_CONTENT}/adapters/storage/gcs && \
+    wget -O - "$(npm view @danmasta/ghost-gcs-adapter dist.tarball)" | tar xz -C /tmp/gcs && \
+    npm install --prefix /tmp/gcs/package --silent --only=production --no-optional --no-progress && \
+    mv /tmp/gcs/package/* ${GHOST_CONTENT}/adapters/storage/gcs
 
 # Remove the symlink and copy the config files.
 RUN rm -f /var/lib/ghost/config.development.json
