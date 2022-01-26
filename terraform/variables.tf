@@ -14,3 +14,9 @@ variable "env" {
   description = "The environment for the resources."
   default     = "dev"
 }
+
+variable "ghost_version" {
+  type        = string
+  description = "The version of the Ghost image."
+  default     = "latest"
+}
