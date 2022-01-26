@@ -17,7 +17,7 @@ steps:
     args: [ '-c', 'terraform validate' ]
 
   - id: 'Build ghost image'
-    name: 'gcr.io/cloud-builders/docker'
+    name: 'docker'
     dir: 'src/ghost'
     entrypoint: 'sh'
     args:
