@@ -26,7 +26,7 @@ steps:
 
   - id: 'Run cd trigger'
     name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - -c
       - |

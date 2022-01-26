@@ -10,7 +10,7 @@ steps:
   - id: 'Run terraform destroy'
     name: 'hashicorp/terraform'
     dir: 'terraform'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - -c
       - |
