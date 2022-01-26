@@ -30,7 +30,7 @@ steps:
         fi
 
   - id: 'Push ghost image'
-    name: 'gcr.io/cloud-builders/docker'
+    name: 'docker'
     entrypoint: 'sh'
     args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
 
