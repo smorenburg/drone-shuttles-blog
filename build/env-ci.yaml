@@ -34,23 +34,9 @@ steps:
     entrypoint: 'sh'
     args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
 
-#  - id: 'Tag ghost image with latest'
-#    name: 'gcr.io/cloud-builders/gcloud'
-#    dir: 'src/nginx-proxy'
-#    entrypoint: 'sh'
-#    args:
-#      - -c
-#      - |
-#        if [[ -z '$TAG_NAME' ]]
-#        then
-#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-#        else
-#          gcloud container images add-tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest
-#        fi
-
   - id: 'Run plan trigger'
     name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args:
       - -c
       - |
