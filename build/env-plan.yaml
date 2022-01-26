@@ -8,8 +8,15 @@ steps:
   - id: 'Run terraform plan'
     name: 'hashicorp/terraform'
     dir: 'terraform'
-    entrypoint: 'sh'
-    args: ['-c', 'terraform plan -out=tf.plan -var=project_id=${PROJECT_ID}']
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          terraform plan -out=tf.plan -var=project_id=${PROJECT_ID} -var=region=${_REGION} -var=ghost_version=${SHORT_SHA}
+        else
+          terraform plan -out=tf.plan -var=project_id=${PROJECT_ID} -var=region=${_REGION} -var=ghost_version=${TAG_NAME}
+        fi
 
   - id: 'Push tf.plan to the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'

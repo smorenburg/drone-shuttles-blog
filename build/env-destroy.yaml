@@ -10,5 +10,12 @@ steps:
   - id: 'Run terraform destroy'
     name: 'hashicorp/terraform'
     dir: 'terraform'
-    entrypoint: 'sh'
-    args: ['-c', 'terraform destroy -auto-approve -var=project_id=${PROJECT_ID}']
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          terraform destroy -auto-approve -var=project_id=${PROJECT_ID} -var=region=${_REGION} -var=ghost_version=${SHORT_SHA}
+        else
+          terraform destroy -auto-approve -var=project_id=${PROJECT_ID} -var=region=${_REGION} -var=ghost_version=${TAG_NAME}
+        fi
