@@ -15,13 +15,7 @@
   },
   "storage": {
     "active": "gcs",
-    "gcs": {
-      "host": "storage.googleapis.com",
-      "protocol": "https",
-      "hash": true,
-      "hashAlgorithm": "sha512",
-      "hashLength": "16"
-    }
+    "gcs": {}
   },
   "mail": {
     "transport": "Direct"
