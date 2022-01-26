@@ -10,6 +10,10 @@
       "filename": "/var/lib/ghost/content/data/ghost.db"
     }
   },
+  "storage": {
+    "active": "gcs",
+    "gcs": {}
+  },
   "mail": {
     "transport": "Direct"
   },
