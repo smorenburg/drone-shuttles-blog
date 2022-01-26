@@ -4,12 +4,14 @@ resource "google_storage_bucket" "content" {
   location                    = "eur4"
   force_destroy               = true
   uniform_bucket_level_access = true
+  # checkov:skip=CKV_GCP_62: Publicly accessible storage bucket, no need for additional logging.
 }
 
 resource "google_storage_bucket_iam_member" "content_public" {
   bucket = google_storage_bucket.content.name
   role   = "roles/storage.objectViewer"
   member = "allUsers"
+  # checkov:skip=CKV_GCP_28: Publicly accessible storage bucket.
 }
 
 resource "google_storage_bucket_iam_member" "ghost_object_creator" {
