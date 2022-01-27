@@ -35,8 +35,8 @@ apis=(
   sqladmin.googleapis.com
 )
 
-for i in ${apis[@]}; do
-  gcloud services enable $i --async
+for api in "${apis[@]}"; do
+  gcloud services enable "$apis" --async
 done
 ```
 
@@ -106,10 +106,10 @@ roles=(
   roles/storage.admin
 )
 
-for i in ${roles[@]}; do
+for role in "${roles[@]}"; do
   gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
-    --role=$i
+    --member serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
+    --role "$role"
 done
 ```
 
@@ -147,7 +147,7 @@ triggers=(
   build/triggers/prod/prod-destroy.yaml
 )
 
-for i in "${triggers[@]}"; do
-  gcloud beta builds triggers import --source "$i"
+for trigger in "${triggers[@]}"; do
+  gcloud beta builds triggers import --source "$trigger"
 done
 ```
