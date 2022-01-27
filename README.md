@@ -1,11 +1,17 @@
-# Nordcloud: Blog assignment
+# The Drone Shuttles Ltd. blog
 
-### General
+## Up and running
 
-#### Create the environment variables
+The following steps are required to prepare the environment and get the service up and running.
+
+### Prerequisites
+
+### Environment
+
+#### Set the (local) environment variables
 
 ```bash
-export PROJECT_ID=project_id
+export PROJECT_ID=<project_id>
 ```
 
 #### Authenticate and configure gcloud
@@ -27,11 +33,10 @@ apis=(
   containerscanning.googleapis.com
   compute.googleapis.com
   sqladmin.googleapis.com
-  cloudkms.googleapis.com
 )
 
 for i in ${apis[@]}; do
-	gcloud services enable $i --async
+  gcloud services enable $i --async
 done
 ```
 
@@ -61,7 +66,7 @@ gcloud artifacts repositories create release \
     --location=europe 
 ```
 
-#### Delete the default firewall rules and default network
+#### Delete the default firewall rules and network (if present)
 
 ```bash
 gcloud compute firewall-rules delete default-allow-icmp default-allow-internal default-allow-rdp default-allow-ssh
@@ -75,17 +80,37 @@ gcloud compute networks delete default
 The following roles are added:
 
 - Artifact Registry Writer
+- Cloud SQL Admin
+- Compute Admin
+- Monitoring Admin
+- Project IAM Admin
+- Service Account Admin
+- Service Account User
+- Storage Admin
 
 ```bash
 export PROJECT_NUMBER=$(
-    gcloud projects list \
+  gcloud projects list \
     --filter="$(gcloud config get-value project)" \
     --format="value(PROJECT_NUMBER)"
 )
+  
+roles=( 
+  roles/artifactregistry.writer
+  roles/cloudsql.admin
+  roles/compute.admin
+  roles/monitoring.admin
+  roles/resourcemanager.projectIamAdmin
+  roles/iam.serviceAccountAdmin
+  roles/iam.serviceAccountUser
+  roles/storage.admin
+)
 
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-        --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
-        --role=roles/owner
+for i in ${roles[@]}; do
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
+    --role=$i
+done
 ```
 
 #### Add the repository to Cloud Build
