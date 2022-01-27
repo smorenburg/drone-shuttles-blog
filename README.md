@@ -50,7 +50,7 @@ gsutil mb -l eur4 -b on gs://$PROJECT_ID-prod-tfstate
 gsutil mb -l eur4 -b on gs://$PROJECT_ID-builds
 ```
 
-#### Create the registries
+#### Create the artifact registries
 
 ```bash
 gcloud artifacts repositories create dev \
@@ -75,7 +75,7 @@ gcloud compute networks delete default
 
 ### Cloud Build
 
-#### Add the roles to the Cloud Build service account
+#### Add the roles to the service account
 
 The following roles are added:
 
@@ -113,12 +113,32 @@ for i in ${roles[@]}; do
 done
 ```
 
-#### Add the repository to Cloud Build
+#### Add the source repository
 
-Describe the steps.
+https://cloud.google.com/build/docs/automating-builds/create-manage-triggers#connect_repo
 
-#### Create the Cloud Build triggers
+#### Create the triggers
 
 ```bash
-# Write code.
+triggers=(
+  build/triggers/dev/dev-ci.yaml
+  build/triggers/dev/dev-plan.yaml
+  build/triggers/dev/dev-cd.yaml
+  build/triggers/dev/dev-destroy.yaml
+  build/triggers/test/test-ci.yaml
+  build/triggers/test/test-plan.yaml
+  build/triggers/test/test-cd.yaml
+  build/triggers/test/test-destroy.yaml
+  build/triggers/release/release-ci.yaml
+  build/triggers/stage/stage-plan.yaml
+  build/triggers/stage/stage-cd.yaml
+  build/triggers/stage/stage-destroy.yaml
+  build/triggers/prod/prod-plan.yaml
+  build/triggers/prod/prod-cd.yaml
+  build/triggers/prod/prod-destroy.yaml
+)
+
+for i in "${triggers[@]}"; do
+  gcloud beta builds triggers import --source "$i"
+done
 ```
