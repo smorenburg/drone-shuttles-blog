@@ -1,3 +1,5 @@
+approvalConfig:
+  approvalRequired: true
 gitFileSource:
   path: build/configs/env-cd.yaml
   repoType: GITHUB
