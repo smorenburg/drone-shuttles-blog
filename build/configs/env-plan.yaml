@@ -24,14 +24,14 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/${_ENV}.tf.plan']
 
-  - id: 'Run cd trigger'
-    name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        if [[ -z '$TAG_NAME' ]]; then
-          gcloud beta builds triggers run ${_ENV}-cd --sha ${COMMIT_SHA}
-        else
-          gcloud beta builds triggers run ${_ENV}-cd --tag ${TAG_NAME}
-        fi
+#  - id: 'Run cd trigger'
+#    name: 'gcr.io/cloud-builders/gcloud'
+#    entrypoint: 'bash'
+#    args:
+#      - -c
+#      - |
+#        if [[ -z '$TAG_NAME' ]]; then
+#          gcloud beta builds triggers run ${_ENV}-cd --sha ${COMMIT_SHA}
+#        else
+#          gcloud beta builds triggers run ${_ENV}-cd --tag ${TAG_NAME}
+#        fi
