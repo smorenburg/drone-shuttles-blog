@@ -24,6 +24,7 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'gsutil cp tf.plan gs://${PROJECT_ID}-builds/${_ENV}.tf.plan']
 
+  # This step runs the next trigger. Preferable this is done trough Pub/Sub, but this configuration is not as portable.
   - id: 'Run cd trigger'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'

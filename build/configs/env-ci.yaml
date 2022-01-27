@@ -34,6 +34,7 @@ steps:
     entrypoint: 'sh'
     args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
 
+  # This step runs the next trigger. Preferable this is done trough Pub/Sub, but this configuration is not as portable.
   - id: 'Run plan trigger'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
