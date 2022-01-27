@@ -5,10 +5,10 @@ resource "google_monitoring_custom_service" "blog" {
 }
 
 # Create the SLOs.
-resource "google_monitoring_slo" "request_latency_90" {
+resource "google_monitoring_slo" "requests_latency_90" {
   service      = google_monitoring_custom_service.blog.service_id
-  slo_id       = "request-latency-90"
-  display_name = "90% of the request latency is below 250 ms"
+  slo_id       = "requests-latency-90"
+  display_name = "90% of the request are below 250 ms latency"
 
   request_based_sli {
     distribution_cut {
@@ -23,10 +23,10 @@ resource "google_monitoring_slo" "request_latency_90" {
   rolling_period_days = 28
 }
 
-resource "google_monitoring_slo" "request_latency_99" {
+resource "google_monitoring_slo" "requests_latency_99" {
   service      = google_monitoring_custom_service.blog.service_id
-  slo_id       = "request-latency-99"
-  display_name = "99% of the request latency is below 500 ms"
+  slo_id       = "requests-latency-99"
+  display_name = "99% of the requests are below 500 ms latency"
 
   request_based_sli {
     distribution_cut {
