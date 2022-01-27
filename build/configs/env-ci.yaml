@@ -34,14 +34,14 @@ steps:
     entrypoint: 'sh'
     args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
 
-#  - id: 'Run plan trigger'
-#    name: 'gcr.io/cloud-builders/gcloud'
-#    entrypoint: 'bash'
-#    args:
-#      - -c
-#      - |
-#        if [[ -z '$TAG_NAME' ]]; then
-#          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
-#        else
-#          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
-#        fi
+  - id: 'Run plan trigger'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
+        else
+          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
+        fi
