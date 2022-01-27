@@ -1,0 +1,16 @@
+gitFileSource:
+  path: build/configs/env-destroy.yaml
+  repoType: GITHUB
+  revision: refs/heads/main
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: test-destroy
+sourceToBuild:
+  ref: refs/heads/main
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: test
+  _MACHINE_TYPE: e2-small
+  _SQL_TIER: db-g1-small
+tags:
+  - test

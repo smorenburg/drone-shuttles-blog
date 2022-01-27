@@ -1,0 +1,15 @@
+filename: build/configs/env-ci.yaml
+github:
+  name: drone-shuttles-blog
+  owner: smorenburg
+  push:
+    branch: ^main$
+includedFiles:
+  - src/**
+  - terraform/**
+name: test-ci
+substitutions:
+  _ENV: test
+  _REGISTRY: test
+tags:
+  - test

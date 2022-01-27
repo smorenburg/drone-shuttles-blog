@@ -1,0 +1,16 @@
+gitFileSource:
+  path: build/configs/env-plan.yaml
+  repoType: GITHUB
+  revision: refs/tags/x.x.x
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: prod-plan
+sourceToBuild:
+  ref: refs/tags/x.x.x
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: prod
+  _MACHINE_TYPE: e2-custom-2-2048
+  _SQL_TIER: db-n1-standard-1
+tags:
+  - prod

@@ -1,0 +1,16 @@
+gitFileSource:
+  path: build/configs/env-destroy.yaml
+  repoType: GITHUB
+  revision: refs/tags/x.x.x
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: stage-destroy
+sourceToBuild:
+  ref: refs/tags/x.x.x
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: stage
+  _MACHINE_TYPE: e2-custom-2-2048
+  _SQL_TIER: db-n1-standard-1
+tags:
+  - stage
