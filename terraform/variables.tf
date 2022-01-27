@@ -5,7 +5,7 @@ variable "project_id" {
 
 variable "region" {
   type        = string
-  description = "The region for the resources."
+  description = "The region for resources."
   default     = "europe-west4"
 }
 
@@ -19,4 +19,16 @@ variable "ghost_version" {
   type        = string
   description = "The version of the Ghost image."
   default     = "latest"
+}
+
+variable "machine_type" {
+  type        = string
+  description = "The compute instance machine type."
+  default     = "e2-small"
+}
+
+variable "sql_tier" {
+  type        = string
+  description = "The SQL instance tier."
+  default     = "db-g1-small"
 }
