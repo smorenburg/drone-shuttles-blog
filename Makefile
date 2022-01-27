@@ -4,8 +4,7 @@ GOOGLE_APPLICATION_CREDENTIALS := $(PWD)/secrets/$(KEY_FILE)
 ENV := dev
 
 define TF_VARS
--var="project_id=$(PROJECT_ID)" \
--var="ghost_version=0.1.2"
+-var="project_id=$(PROJECT_ID)"
 endef
 
 define TF_IMPORTS
