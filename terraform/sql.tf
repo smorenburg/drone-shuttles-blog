@@ -6,7 +6,7 @@ resource "google_sql_database_instance" "master" {
   deletion_protection = false
 
   settings {
-    tier              = "db-n1-standard-1"
+    tier              = var.sql_tier
     availability_type = "REGIONAL"
 
     backup_configuration {
@@ -28,7 +28,7 @@ resource "google_sql_database_instance" "replica" {
   master_instance_name = google_sql_database_instance.master.name
 
   settings {
-    tier = "db-n1-standard-1"
+    tier = var.sql_tier
 
     ip_configuration {
       require_ssl = true

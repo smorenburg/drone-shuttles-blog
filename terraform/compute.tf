@@ -143,7 +143,7 @@ resource "google_project_iam_member" "ghost_log_writer" {
 # Creat the instance template.
 resource "google_compute_instance_template" "ghost" {
   name_prefix  = "${var.env}-ghost-${local.region_suffix}-template-"
-  machine_type = "e2-custom-2-2048"
+  machine_type = var.machine_type
   tags         = ["instance"]
 
   scheduling {
