@@ -1,0 +1,47 @@
+steps:
+  - id: 'Run checkov'
+    name: 'bridgecrew/checkov'
+    entrypoint: 'sh'
+    args: [ '-c', 'checkov --directory .' ]
+
+  - id: 'Run terraform init'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: [ '-c', 'terraform init -backend=false' ]
+
+  - id: 'Run terraform validate'
+    name: 'hashicorp/terraform'
+    dir: 'terraform'
+    entrypoint: 'sh'
+    args: [ '-c', 'terraform validate' ]
+
+  - id: 'Build ghost image'
+    name: 'docker'
+    dir: 'src/ghost'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
+        else
+          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
+        fi
+
+  - id: 'Push ghost image'
+    name: 'docker'
+    entrypoint: 'sh'
+    args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
+
+  - id: 'Run plan trigger'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z '$TAG_NAME' ]]; then
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
+        else
+          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
+        fi

@@ -1,0 +1,12 @@
+filename: build/configs/env-ci.yaml
+github:
+  name: drone-shuttles-blog
+  owner: smorenburg
+  push:
+    tag: .*
+name: release-ci
+substitutions:
+  _ENV: stage
+  _REGISTRY: release
+tags:
+  - release

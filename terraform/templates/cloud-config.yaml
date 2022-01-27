@@ -1,0 +1,53 @@
+#cloud-config
+
+---
+write_files:
+  - path: /etc/systemd/system/config-firewall.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Configures the host firewall
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      ExecStart=/sbin/iptables -A INPUT -p tcp --dport 2368 -j ACCEPT
+
+  - path: /etc/systemd/system/sql-proxy.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Starts the sql proxy service
+      Wants=gcr-online.target docker.service
+      After=gcr-online.target docker.service
+
+      [Service]
+      Environment="HOME=/home/sql-proxy"
+      Restart=always
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStart=/usr/bin/docker run --name sql-proxy --net host gcr.io/cloudsql-docker/gce-proxy:${sql_proxy_version} /cloud_sql_proxy -instances=${sql_proxy_instances}=tcp:0.0.0.0:3306
+      ExecStop=/usr/bin/docker stop sql-proxy
+      ExecStopPost=/usr/bin/docker rm -v sql-proxy
+
+  - path: /etc/systemd/system/ghost.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=Starts the ghost service
+      Wants=gcr-online.target docker.service config-firewall.service sql-proxy.service
+      After=gcr-online.target docker.service config-firewall.service sql-proxy.service
+
+      [Service]
+      Environment="HOME=/home/ghost"
+      Restart=always
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries europe-docker.pkg.dev
+      ExecStart=/usr/bin/docker run --name ghost --net host -e storage__gcs__bucket=${ghost_content_bucket} -e url=${ghost_url} europe-docker.pkg.dev/${project_id}/${registry}/ghost:${ghost_version}
+      ExecStop=/usr/bin/docker stop ghost
+      ExecStopPost=/usr/bin/docker rm -v ghost
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl start ghost.service

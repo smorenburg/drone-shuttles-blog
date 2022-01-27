@@ -1,0 +1,16 @@
+approvalConfig:
+  approvalRequired: true
+gitFileSource:
+  path: build/configs/env-cd.yaml
+  repoType: GITHUB
+  revision: refs/tags/x.x.x
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: stage-cd
+sourceToBuild:
+  ref: refs/tags/x.x.x
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: stage
+tags:
+  - stage

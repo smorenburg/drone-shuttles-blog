@@ -1,0 +1,16 @@
+approvalConfig:
+  approvalRequired: true
+gitFileSource:
+  path: build/configs/env-cd.yaml
+  repoType: GITHUB
+  revision: refs/heads/dev
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: dev-cd
+sourceToBuild:
+  ref: refs/heads/dev
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: dev
+tags:
+  - dev

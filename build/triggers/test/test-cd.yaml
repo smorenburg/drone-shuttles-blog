@@ -1,0 +1,14 @@
+gitFileSource:
+  path: build/configs/env-cd.yaml
+  repoType: GITHUB
+  revision: refs/heads/main
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+name: test-cd
+sourceToBuild:
+  ref: refs/heads/main
+  repoType: GITHUB
+  uri: https://github.com/smorenburg/drone-shuttles-blog
+substitutions:
+  _ENV: test
+tags:
+  - test
