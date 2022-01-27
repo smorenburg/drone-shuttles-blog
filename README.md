@@ -115,7 +115,16 @@ done
 
 #### Add the source repository
 
-https://cloud.google.com/build/docs/automating-builds/create-manage-triggers#connect_repo
+Complete the following steps to connect to GitHub:
+
+1. Open the **Triggers** page in the Google Cloud Console.
+2. Select your project and click **Open**.
+3. Click **Connect Repository**.
+4. Select **GitHub (Cloud Build GitHub App)**.
+5. Click **Continue**.
+6. Authenticate to GitHub.
+7. From the list of available repositories, select the desired repository, then click **Connect**. 
+8. Click **Done**.
 
 #### Create the triggers
 
