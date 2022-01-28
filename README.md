@@ -108,9 +108,15 @@ roles=(
 
 for role in "${roles[@]}"; do
   gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
-    --role "$role"
+    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
+    --role="$role"
 done
+```
+
+#### Create the Pub/Sub topic
+
+```bash
+gcloud pubsub topics create cloud-builds
 ```
 
 #### Add the source repository
@@ -130,24 +136,36 @@ Complete the following steps to connect to GitHub:
 
 ```bash
 triggers=(
-  build/triggers/dev/dev-ci.yaml
-  build/triggers/dev/dev-plan.yaml
-  build/triggers/dev/dev-cd.yaml
-  build/triggers/dev/dev-destroy.yaml
-  build/triggers/test/test-ci.yaml
-  build/triggers/test/test-plan.yaml
-  build/triggers/test/test-cd.yaml
-  build/triggers/test/test-destroy.yaml
-  build/triggers/release/release-ci.yaml
-  build/triggers/stage/stage-plan.yaml
-  build/triggers/stage/stage-cd.yaml
-  build/triggers/stage/stage-destroy.yaml
-  build/triggers/prod/prod-plan.yaml
-  build/triggers/prod/prod-cd.yaml
-  build/triggers/prod/prod-destroy.yaml
+  dev/dev-ci.yaml
+  dev/dev-plan.yaml
+  dev/dev-cd.yaml
+  dev/dev-plan-destroy.yaml
+  dev/dev-destroy.yaml
+  test/test-ci.yaml
+  test/test-plan.yaml
+  test/test-cd.yaml
+  test/test-plan-destroy.yaml
+  test/test-destroy.yaml
+  release/release-ci.yaml
+  stage/stage-plan.yaml
+  stage/stage-cd.yaml
+  stage/stage-plan-destroy.yaml
+  stage/stage-destroy.yaml
+  prod/prod-plan.yaml
+  prod/prod-cd.yaml
+  prod/prod-plan-destroy.yaml
+  prod/prod-destroy.yaml
 )
 
+# Create the tmp directory.
+mkdir -p build/tmp/dev build/tmp/test build/tmp/release build/tmp/stage build/tmp/prod
+
+# Loop through the files, replace <project_id> with $PROJECT_ID, and create the trigger.
 for trigger in "${triggers[@]}"; do
-  gcloud beta builds triggers import --source "$trigger"
+  sed "s/<project_id>/$PROJECT_ID/g" "build/triggers/$trigger" > "build/tmp/$trigger"
+  gcloud beta builds triggers import --source="build/tmp/$trigger"
 done
+
+# Remove the tmp directory.
+rm -f -r build/tmp
 ```
