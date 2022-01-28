@@ -10,7 +10,6 @@ includedFiles:
 name: dev-ci
 substitutions:
   _ENV: dev
-  _REGISTRY: dev
 tags:
   - dev
   - ci

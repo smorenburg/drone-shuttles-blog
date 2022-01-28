@@ -7,7 +7,6 @@ github:
 name: release-ci
 substitutions:
   _ENV: stage
-  _REGISTRY: release
 tags:
   - release
   - ci
