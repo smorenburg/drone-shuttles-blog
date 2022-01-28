@@ -23,26 +23,24 @@ steps:
     args:
       - -c
       - |
-        if [[ -z '$TAG_NAME' ]]; then
-          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${SHORT_SHA} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
+        if [ "$_ENV" == "dev" ]; then
+          docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost:${SHORT_SHA}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost:latest" .
+        elif [[ -z "$TAG_NAME" ]]; then
+          docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost:${SHORT_SHA}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost:latest" .
         else
-          docker build --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:${TAG_NAME} --tag europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost:latest .
+          docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost:${TAG_NAME}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost:latest" .
         fi
 
   - id: 'Push ghost image'
     name: 'docker'
     entrypoint: 'sh'
-    args: [ '-c', 'docker push --all-tags europe-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY}/ghost' ]
-
-  # This step runs the next trigger. Preferable this is done trough Pub/Sub, but this configuration is not as portable.
-#  - id: 'Run plan trigger'
-#    name: 'gcr.io/cloud-builders/gcloud'
-#    entrypoint: 'bash'
-#    args:
-#      - -c
-#      - |
-#        if [[ -z '$TAG_NAME' ]]; then
-#          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
-#        else
-#          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
-#        fi
+    args:
+      - -c
+      - |
+        if [ "$_ENV" == "dev" ]; then
+          docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost"
+        elif [[ -z "$TAG_NAME" ]]; then
+          docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost"
+        else
+          docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost"
+        fi
