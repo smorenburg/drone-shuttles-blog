@@ -12,14 +12,14 @@ steps:
     args:
       - -c
       - |
-        if [[ -z '$TAG_NAME' ]]; then
-          terraform plan -destroy -out=destroy.tf.plan -var=project_id=${PROJECT_ID} -var=env=${_ENV} -var=ghost_version=${SHORT_SHA} -var=machine_type=${_MACHINE_TYPE} -var=sql_tier=${_SQL_TIER}
+        if [[ -z "${TAG_NAME}" ]]; then
+          terraform plan -destroy -out=destroy.tf.plan -var="project_id=${PROJECT_ID}" -var="env=${_ENV}" -var="ghost_version=${SHORT_SHA}" -var="machine_type=${_MACHINE_TYPE}" -var="sql_tier=${_SQL_TIER}"
         else
-          terraform plan -destroy -out=destroy.tf.plan -var=project_id=${PROJECT_ID} -var=env=${_ENV} -var=ghost_version=${TAG_NAME} -var=machine_type=${_MACHINE_TYPE} -var=sql_tier=${_SQL_TIER}
+          terraform plan -destroy -out=destroy.tf.plan -var="project_id=${PROJECT_ID}" -var="env=${_ENV}" -var="ghost_version=${TAG_NAME}" -var="machine_type=${_MACHINE_TYPE}" -var="sql_tier=${_SQL_TIER}"
         fi
 
   - id: 'Push destroy.tf.plan to the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'bash'
-    args: ['-c', 'gsutil cp destroy.tf.plan gs://${PROJECT_ID}-builds/${_ENV}.destroy.tf.plan']
+    args: ['-c', 'gsutil cp destroy.tf.plan "gs://${PROJECT_ID}-builds/${_ENV}.destroy.tf.plan"']

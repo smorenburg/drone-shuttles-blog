@@ -10,7 +10,6 @@ includedFiles:
 name: test-ci
 substitutions:
   _ENV: test
-  _REGISTRY: test
 tags:
   - test
   - ci
