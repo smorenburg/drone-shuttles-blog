@@ -18,7 +18,7 @@ export PROJECT_ID=<project_id>
 
 ```bash
 gcloud auth login
-gcloud config set project $PROJECT_ID
+gcloud config set project ${PROJECT_ID}
 ```
 
 #### Enable the APIs (services)
@@ -36,18 +36,18 @@ apis=(
 )
 
 for api in "${apis[@]}"; do
-  gcloud services enable "$apis" --async
+  gcloud services enable "${api}" --async
 done
 ```
 
 #### Create the storage buckets
 
 ```bash
-gsutil mb -l eur4 -b on gs://$PROJECT_ID-dev-tfstate
-gsutil mb -l eur4 -b on gs://$PROJECT_ID-test-tfstate
-gsutil mb -l eur4 -b on gs://$PROJECT_ID-stage-tfstate
-gsutil mb -l eur4 -b on gs://$PROJECT_ID-prod-tfstate
-gsutil mb -l eur4 -b on gs://$PROJECT_ID-builds
+gsutil mb -l eur4 -b on gs://${PROJECT_ID}-dev-tfstate
+gsutil mb -l eur4 -b on gs://${PROJECT_ID}-test-tfstate
+gsutil mb -l eur4 -b on gs://${PROJECT_ID}-stage-tfstate
+gsutil mb -l eur4 -b on gs://${PROJECT_ID}-prod-tfstate
+gsutil mb -l eur4 -b on gs://${PROJECT_ID}-builds
 ```
 
 #### Create the artifact registries
@@ -91,8 +91,8 @@ The following roles are added:
 ```bash
 export PROJECT_NUMBER=$(
   gcloud projects list \
-    --filter="$(gcloud config get-value project)" \
-    --format="value(PROJECT_NUMBER)"
+    --filter "$(gcloud config get-value project)" \
+    --format "value(PROJECT_NUMBER)"
 )
   
 roles=( 
@@ -107,9 +107,9 @@ roles=(
 )
 
 for role in "${roles[@]}"; do
-  gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
-    --role="$role"
+  gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
+    --role "${role}"
 done
 ```
 
@@ -162,8 +162,8 @@ mkdir -p build/tmp/dev build/tmp/test build/tmp/release build/tmp/stage build/tm
 
 # Loop through the files, replace <project_id> with $PROJECT_ID, and create the trigger.
 for trigger in "${triggers[@]}"; do
-  sed "s/<project_id>/$PROJECT_ID/g" "build/triggers/$trigger" > "build/tmp/$trigger"
-  gcloud beta builds triggers import --source="build/tmp/$trigger"
+  sed "s/<project_id>/${PROJECT_ID}/g" "build/triggers/${trigger}" > "build/tmp/${trigger}"
+  gcloud beta builds triggers import --source "build/tmp/${trigger}"
 done
 
 # Remove the tmp directory.
