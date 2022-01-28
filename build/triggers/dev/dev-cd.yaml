@@ -1,16 +1,22 @@
 approvalConfig:
   approvalRequired: true
+filter: "_STATUS.matches(\"^SUCCESS$\") &&\n_TRIGGER_NAME.matches(\"^dev-plan$\")"
 gitFileSource:
   path: build/configs/env-cd.yaml
   repoType: GITHUB
   revision: refs/heads/dev
   uri: https://github.com/smorenburg/drone-shuttles-blog
 name: dev-cd
+pubsubConfig:
+  topic: projects/<project_id>/topics/cloud-builds
 sourceToBuild:
   ref: refs/heads/dev
   repoType: GITHUB
   uri: https://github.com/smorenburg/drone-shuttles-blog
 substitutions:
   _ENV: dev
+  _STATUS: $(body.message.attributes.status)
+  _TRIGGER_NAME: $(body.message.data.substitutions.TRIGGER_NAME)
 tags:
   - dev
+  - cd

@@ -7,15 +7,14 @@ steps:
     entrypoint: 'sh'
     args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
 
-  - id: 'Run terraform destroy'
+  - id: 'Pull destroy.tf.plan from the builds storage bucket'
+    name: 'gcr.io/cloud-builders/gcloud'
+    dir: 'terraform'
+    entrypoint: 'bash'
+    args: ['-c', 'gsutil cp gs://${PROJECT_ID}-builds/${_ENV}.destroy.tf.plan destroy.tf.plan']
+
+  - id: 'Run terraform apply'
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args:
-      - -c
-      - |
-        if [[ -z '$TAG_NAME' ]]; then
-          terraform destroy -auto-approve -var=project_id=${PROJECT_ID} -var=env=${_ENV} -var=ghost_version=${SHORT_SHA} -var=machine_type=${_MACHINE_TYPE} -var=sql_tier=${_SQL_TIER}
-        else
-          terraform destroy -auto-approve -var=project_id=${PROJECT_ID} -var=env=${_ENV} -var=ghost_version=${TAG_NAME} -var=machine_type=${_MACHINE_TYPE} -var=sql_tier=${_SQL_TIER}
-        fi
+    args: ['-c', 'terraform apply destroy.tf.plan']

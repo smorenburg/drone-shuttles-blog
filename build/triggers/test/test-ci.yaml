@@ -13,3 +13,4 @@ substitutions:
   _REGISTRY: test
 tags:
   - test
+  - ci
