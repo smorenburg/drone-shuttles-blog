@@ -5,13 +5,13 @@ steps:
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
+    args: ['-c', 'terraform init -backend-config="bucket=${PROJECT_ID}-${_ENV}-tfstate"']
 
   - id: 'Pull tf.plan from the builds storage bucket'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'bash'
-    args: ['-c', 'gsutil cp gs://${PROJECT_ID}-builds/${_ENV}.tf.plan tf.plan']
+    args: ['-c', 'gsutil cp "gs://${PROJECT_ID}-builds/${_ENV}.tf.plan" tf.plan']
 
   - id: 'Run terraform apply'
     name: 'hashicorp/terraform'

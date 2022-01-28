@@ -23,9 +23,9 @@ steps:
     args:
       - -c
       - |
-        if [ "$_ENV" == "dev" ]; then
+        if [ "{$_ENV}" == "dev" ]; then
           docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost:${SHORT_SHA}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost:latest" .
-        elif [[ -z "$TAG_NAME" ]]; then
+        elif [[ -z "{$TAG_NAME}" ]]; then
           docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost:${SHORT_SHA}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost:latest" .
         else
           docker build --tag "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost:${TAG_NAME}" --tag "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost:latest" .
@@ -37,9 +37,9 @@ steps:
     args:
       - -c
       - |
-        if [ "$_ENV" == "dev" ]; then
+        if [ "{$_ENV}" == "dev" ]; then
           docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/dev/ghost"
-        elif [[ -z "$TAG_NAME" ]]; then
+        elif [[ -z "{$TAG_NAME}" ]]; then
           docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/test/ghost"
         else
           docker push --all-tags "europe-docker.pkg.dev/${PROJECT_ID}/release/ghost"

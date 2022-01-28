@@ -12,7 +12,7 @@ steps:
     args:
       - -c
       - |
-        if [[ -z "$TAG_NAME" ]]; then
+        if [[ -z "{$TAG_NAME}" ]]; then
           terraform plan -out=tf.plan -var="project_id=${PROJECT_ID}" -var="env=${_ENV}" -var="ghost_version=${SHORT_SHA}" -var="machine_type=${_MACHINE_TYPE}" -var="sql_tier=${_SQL_TIER}"
         else
           terraform plan -out=tf.plan -var="project_id=${PROJECT_ID}" -var="env=${_ENV}" -var="ghost_version=${TAG_NAME}" -var="machine_type=${_MACHINE_TYPE}" -var="sql_tier=${_SQL_TIER}"
