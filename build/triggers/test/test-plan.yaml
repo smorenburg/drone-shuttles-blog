@@ -1,9 +1,12 @@
+filter: "_STATUS.matches(\"^SUCCESS$\") &&\n_TRIGGER_NAME.matches(\"^test-ci$\")"
 gitFileSource:
   path: build/configs/env-plan.yaml
   repoType: GITHUB
   revision: refs/heads/main
   uri: https://github.com/smorenburg/drone-shuttles-blog
 name: test-plan
+pubsubConfig:
+  topic: projects/<project_id>/topics/cloud-builds
 sourceToBuild:
   ref: refs/heads/main
   repoType: GITHUB
@@ -12,5 +15,8 @@ substitutions:
   _ENV: test
   _MACHINE_TYPE: e2-small
   _SQL_TIER: db-g1-small
+  _STATUS: $(body.message.attributes.status)
+  _TRIGGER_NAME: $(body.message.data.substitutions.TRIGGER_NAME)
 tags:
   - test
+  - plan

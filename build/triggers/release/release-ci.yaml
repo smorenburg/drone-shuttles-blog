@@ -10,3 +10,4 @@ substitutions:
   _REGISTRY: release
 tags:
   - release
+  - ci

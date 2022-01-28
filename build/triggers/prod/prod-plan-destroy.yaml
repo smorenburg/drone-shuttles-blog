@@ -1,12 +1,9 @@
-filter: "_STATUS.matches(\"^SUCCESS$\") &&\n_TRIGGER_NAME.matches(\"^prod-ci$\")"
 gitFileSource:
-  path: build/configs/env-plan.yaml
+  path: build/configs/env-plan-destroy.yaml
   repoType: GITHUB
   revision: refs/tags/x.x.x
   uri: https://github.com/smorenburg/drone-shuttles-blog
-name: prod-plan
-pubsubConfig:
-  topic: projects/<project_id>/topics/cloud-builds
+name: prod-plan-destroy
 sourceToBuild:
   ref: refs/tags/x.x.x
   repoType: GITHUB
@@ -15,8 +12,7 @@ substitutions:
   _ENV: prod
   _MACHINE_TYPE: e2-custom-2-2048
   _SQL_TIER: db-n1-standard-1
-  _STATUS: $(body.message.attributes.status)
-  _TRIGGER_NAME: $(body.message.data.substitutions.TRIGGER_NAME)
 tags:
   - prod
   - plan
+  - destroy

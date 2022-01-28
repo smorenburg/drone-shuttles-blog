@@ -1,9 +1,14 @@
+approvalConfig:
+  approvalRequired: true
+filter: "_STATUS.matches(\"^SUCCESS$\") &&\n_TRIGGER_NAME.matches(\"^dev-plan-destroy$\")"
 gitFileSource:
   path: build/configs/env-destroy.yaml
   repoType: GITHUB
   revision: refs/heads/dev
   uri: https://github.com/smorenburg/drone-shuttles-blog
 name: dev-destroy
+pubsubConfig:
+  topic: projects/<project_id>/topics/cloud-builds
 sourceToBuild:
   ref: refs/heads/dev
   repoType: GITHUB
@@ -12,5 +17,8 @@ substitutions:
   _ENV: dev
   _MACHINE_TYPE: e2-small
   _SQL_TIER: db-g1-small
+  _STATUS: $(body.message.attributes.status)
+  _TRIGGER_NAME: $(body.message.data.substitutions.TRIGGER_NAME)
 tags:
   - dev
+  - destroy

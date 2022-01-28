@@ -13,3 +13,4 @@ substitutions:
   _REGISTRY: dev
 tags:
   - dev
+  - ci
