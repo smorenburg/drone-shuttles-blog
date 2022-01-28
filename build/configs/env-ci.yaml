@@ -52,7 +52,7 @@ steps:
       - -c
       - |
         if [[ -z "${TAG_NAME}" ]]; then
-          gcloud beta builds triggers run ${_ENV}-plan --branch ${BRANCH_NAME} --sha ${COMMIT_SHA}
+          gcloud beta builds triggers run ${_ENV}-plan --sha ${COMMIT_SHA}
         else
-          gcloud beta builds triggers run ${_ENV}-plan --branch ${BRANCH_NAME} --tag ${TAG_NAME}
+          gcloud beta builds triggers run ${_ENV}-plan --tag ${TAG_NAME}
         fi
