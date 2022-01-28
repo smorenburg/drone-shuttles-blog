@@ -3,7 +3,7 @@ steps:
     name: 'hashicorp/terraform'
     dir: 'terraform'
     entrypoint: 'sh'
-    args: ['-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate']
+    args: [ '-c', 'terraform init -backend-config=bucket=${PROJECT_ID}-${_ENV}-tfstate' ]
 
   - id: 'Run terraform plan destroy'
     name: 'hashicorp/terraform'
@@ -22,4 +22,16 @@ steps:
     name: 'gcr.io/cloud-builders/gcloud'
     dir: 'terraform'
     entrypoint: 'bash'
-    args: ['-c', 'gsutil cp destroy.tf.plan "gs://${PROJECT_ID}-builds/${_ENV}.destroy.tf.plan"']
+    args: [ '-c', 'gsutil cp destroy.tf.plan "gs://${PROJECT_ID}-builds/${_ENV}.destroy.tf.plan"' ]
+
+  - id: 'Run destroy trigger'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        if [[ -z "${TAG_NAME}" ]]; then
+          gcloud beta builds triggers run ${_ENV}-destroy --sha ${COMMIT_SHA}
+        else
+          gcloud beta builds triggers run ${_ENV}-destroy --tag ${TAG_NAME}
+        fi
