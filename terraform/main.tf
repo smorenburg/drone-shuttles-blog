@@ -31,7 +31,7 @@ provider "google-beta" {
 
 locals {
   # Set the region suffix, ew4 for europe-west4, and en1 for europe-north1.
-  region_suffix = var.region == "europe-west4" ?  "ew4" : "en1"
+  region_suffix = var.region == "europe-west4" ? "ew4" : "en1"
 
   # Set the local domain variable for the SSL certificate, load balancer (header), and Ghost URL.
   domain = "${var.env}.${google_compute_global_address.ghost.address}.nip.io"
@@ -55,4 +55,32 @@ resource "random_id" "suffix" {
   byte_length = 2
 }
 
+# Generate a random password for the posts user and write to secret manager.
+resource "random_password" "posts" {
+  length  = 16
+  special = true
+}
 
+resource "google_secret_manager_secret" "posts_password" {
+  secret_id = "posts-password"
+
+  labels = {
+    username = "posts"
+  }
+
+  replication {
+    user_managed {
+      replicas {
+        location = "europe-west4"
+      }
+      replicas {
+        location = "europe-north1"
+      }
+    }
+  }
+}
+
+resource "google_secret_manager_secret_version" "posts_password" {
+  secret      = google_secret_manager_secret.posts_password.id
+  secret_data = random_password.posts.result
+}
