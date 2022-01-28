@@ -1,22 +1,17 @@
 approvalConfig:
   approvalRequired: true
-filter: "_STATUS.matches(\"^SUCCESS$\") &&\n_TRIGGER_NAME.matches(\"^prod-plan-destroy$\")"
 gitFileSource:
   path: build/configs/env-destroy.yaml
   repoType: GITHUB
   revision: refs/tags/x.x.x
   uri: https://github.com/smorenburg/drone-shuttles-blog
 name: prod-destroy
-pubsubConfig:
-  topic: projects/<project_id>/topics/cloud-builds
 sourceToBuild:
   ref: refs/tags/x.x.x
   repoType: GITHUB
   uri: https://github.com/smorenburg/drone-shuttles-blog
 substitutions:
   _ENV: prod
-  _STATUS: $(body.message.attributes.status)
-  _TRIGGER_NAME: $(body.message.data.substitutions.TRIGGER_NAME)
 tags:
   - prod
   - destroy
