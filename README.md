@@ -172,5 +172,5 @@ done
 ### Invoke the function
 
 ```bash
-gcloud functions call posts-delete-all-function
+gcloud functions call posts-delete-all-function --region europe-west1
 ```
