@@ -54,33 +54,3 @@ locals {
 resource "random_id" "suffix" {
   byte_length = 2
 }
-
-# Generate a random password for the posts user and write to secret manager.
-resource "random_password" "posts" {
-  length  = 16
-  special = true
-}
-
-resource "google_secret_manager_secret" "posts_password" {
-  secret_id = "posts-password"
-
-  labels = {
-    username = "posts"
-  }
-
-  replication {
-    user_managed {
-      replicas {
-        location = "europe-west4"
-      }
-      replicas {
-        location = "europe-north1"
-      }
-    }
-  }
-}
-
-resource "google_secret_manager_secret_version" "posts_password" {
-  secret      = google_secret_manager_secret.posts_password.id
-  secret_data = random_password.posts.result
-}

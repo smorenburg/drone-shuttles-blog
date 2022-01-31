@@ -190,9 +190,10 @@ resource "google_compute_instance_template" "ghost" {
 resource "google_compute_region_instance_group_manager" "ghost" {
   provider = google-beta
 
-  name               = "${var.env}-ghost-${local.region_suffix}-group"
-  base_instance_name = "${var.env}-ghost-${local.region_suffix}-instance"
-  target_size        = 1
+  name                      = "${var.env}-ghost-${local.region_suffix}-group"
+  base_instance_name        = "${var.env}-ghost-${local.region_suffix}-instance"
+  target_size               = 1
+  wait_for_instances_status = "STABLE"
 
   version {
     instance_template = google_compute_instance_template.ghost.id
@@ -209,7 +210,7 @@ resource "google_compute_region_instance_group_manager" "ghost" {
     minimal_action               = "REPLACE"
     max_surge_fixed              = 3
     max_unavailable_fixed        = 3
-    min_ready_sec                = 15
+    min_ready_sec                = 60
     replacement_method           = "SUBSTITUTE"
   }
 

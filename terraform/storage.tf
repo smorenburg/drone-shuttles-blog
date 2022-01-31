@@ -19,3 +19,17 @@ resource "google_storage_bucket_iam_member" "ghost_object_creator" {
   role   = "roles/storage.objectCreator"
   member = "serviceAccount:${google_service_account.ghost.email}"
 }
+
+# Create the functions storage bucket and upload object.
+resource "google_storage_bucket" "functions" {
+  name     = "${var.project_id}-${var.env}-functions"
+  location                    = "europe-west1"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+}
+
+resource "google_storage_bucket_object" "posts" {
+  name   = "2201311830_posts.zip"
+  bucket = google_storage_bucket.functions.name
+  source = "./functions/2201311830_posts.zip"
+}

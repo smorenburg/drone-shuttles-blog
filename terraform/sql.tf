@@ -54,5 +54,4 @@ resource "google_sql_user" "ghost" {
 resource "google_sql_user" "posts" {
   name     = "posts"
   instance = google_sql_database_instance.master.name
-  password = random_password.posts.result
 }
