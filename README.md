@@ -44,11 +44,11 @@ done
 #### Create the storage buckets
 
 ```bash
-gsutil mb -l eur4 -b on gs://${PROJECT_ID}-dev-tfstate
-gsutil mb -l eur4 -b on gs://${PROJECT_ID}-test-tfstate
-gsutil mb -l eur4 -b on gs://${PROJECT_ID}-stage-tfstate
-gsutil mb -l eur4 -b on gs://${PROJECT_ID}-prod-tfstate
-gsutil mb -l eur4 -b on gs://${PROJECT_ID}-builds
+gsutil mb -l eu -b on gs://${PROJECT_ID}-dev-tfstate
+gsutil mb -l eu -b on gs://${PROJECT_ID}-test-tfstate
+gsutil mb -l eu -b on gs://${PROJECT_ID}-stage-tfstate
+gsutil mb -l eu -b on gs://${PROJECT_ID}-prod-tfstate
+gsutil mb -l eu -b on gs://${PROJECT_ID}-builds
 ```
 
 #### Create the artifact registries
@@ -172,5 +172,5 @@ done
 ### Invoke the function
 
 ```bash
-gcloud functions call posts-delete-all-function --region europe-west1
+gcloud functions call posts-function-delete-all --region europe-west1
 ```
