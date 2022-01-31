@@ -33,6 +33,7 @@ apis=(
   containerscanning.googleapis.com
   compute.googleapis.com
   sqladmin.googleapis.com
+  cloudfunctions.googleapis.com
 )
 
 for api in "${apis[@]}"; do
@@ -80,10 +81,12 @@ gcloud compute networks delete default
 The following roles are added:
 
 - Artifact Registry Writer
+- Cloud Functions Admin
 - Cloud SQL Admin
 - Compute Admin
 - Monitoring Admin
 - Project IAM Admin
+- Secret Manager Admin
 - Service Account Admin
 - Service Account User
 - Storage Admin
@@ -97,10 +100,12 @@ export PROJECT_NUMBER=$(
   
 roles=( 
   roles/artifactregistry.writer
+  roles/cloudfunctions.admin
   roles/cloudsql.admin
   roles/compute.admin
   roles/monitoring.admin
   roles/resourcemanager.projectIamAdmin
+  roles/secretmanager.admin
   roles/iam.serviceAccountAdmin
   roles/iam.serviceAccountUser
   roles/storage.admin
@@ -160,4 +165,12 @@ triggers=(
 for trigger in "${triggers[@]}"; do
   gcloud beta builds triggers import --source "build/triggers/${trigger}"
 done
+```
+
+## Usage
+
+### Invoke the function
+
+```bash
+gcloud functions call posts-delete-all-function
 ```
