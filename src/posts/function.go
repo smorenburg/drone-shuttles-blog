@@ -1,10 +1,8 @@
-package main
+package posts
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
-	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	_ "github.com/go-sql-driver/mysql"
 	"io"
@@ -19,26 +17,10 @@ type db struct {
 }
 
 func init() {
-	functions.HTTP("deleteAll", deleteAll)
+	functions.HTTP("DeleteAll", DeleteAll)
 }
 
-func main() {
-	ctx := context.Background()
-
-	// Register the deleteAll function.
-	err := funcframework.RegisterHTTPFunctionContext(ctx, "/", deleteAll)
-	if err != nil {
-		log.Fatalf("funcframework.RegisterHTTPFunctionContext: %v\n", err)
-	}
-
-	// Start the function framework.
-	err = funcframework.Start("8080")
-	if err != nil {
-		log.Fatalf("funcframework.Start: %v\n", err)
-	}
-}
-
-func deleteAll(w http.ResponseWriter, _ *http.Request) {
+func DeleteAll(w http.ResponseWriter, _ *http.Request) {
 	// Set the tables related to the posts.
 	t := []string{"posts", "posts_meta", "posts_authors", "posts_tags"}
 
@@ -49,7 +31,7 @@ func deleteAll(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		_, _ = io.WriteString(w, "Something went wrong, check the logs\n")
 	} else {
-		_, _ = io.WriteString(w, "Deleted all posts\n")
+		_, _ = io.WriteString(w, "Deleted the all posts\n")
 	}
 
 	db.closeClient()
@@ -79,7 +61,7 @@ func (db *db) truncateTables(tables []string) error {
 		return err
 	}
 
-	log.Printf("Deleted all posts\n")
+	log.Printf("Deleted all the posts\n")
 	return nil
 }
 
