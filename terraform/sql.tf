@@ -40,7 +40,7 @@ resource "google_sql_database_instance" "replica" {
   }
 }
 
-# Create the SQL database and user.
+# Create the SQL database and users.
 resource "google_sql_database" "ghost" {
   name     = "ghost"
   instance = google_sql_database_instance.master.name
@@ -49,4 +49,10 @@ resource "google_sql_database" "ghost" {
 resource "google_sql_user" "ghost" {
   name     = "ghost"
   instance = google_sql_database_instance.master.name
+}
+
+resource "google_sql_user" "posts" {
+  name     = "posts"
+  instance = google_sql_database_instance.master.name
+  password = random_password.posts.result
 }

@@ -129,7 +129,7 @@ Complete the following steps to connect to GitHub:
 4. Select **GitHub (Cloud Build GitHub App)**.
 5. Click **Continue**.
 6. Authenticate to GitHub.
-7. From the list of available repositories, select the desired repository, then click **Connect**. 
+7. From the list of available repositories, select the desired repository, then click **Connect**.
 8. Click **Done**.
 
 #### Create the triggers
@@ -157,15 +157,7 @@ triggers=(
   prod/prod-destroy.yaml
 )
 
-# Create the tmp directory.
-mkdir -p build/tmp/dev build/tmp/test build/tmp/release build/tmp/stage build/tmp/prod
-
-# Loop through the files, replace <project_id> with $PROJECT_ID, and create the trigger.
 for trigger in "${triggers[@]}"; do
-  sed "s/<project_id>/${PROJECT_ID}/g" "build/triggers/${trigger}" > "build/tmp/${trigger}"
-  gcloud beta builds triggers import --source "build/tmp/${trigger}"
+  gcloud beta builds triggers import --source "build/triggers/${trigger}"
 done
-
-# Remove the tmp directory.
-rm -f -r build/tmp
 ```
