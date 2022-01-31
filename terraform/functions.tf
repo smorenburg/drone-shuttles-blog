@@ -12,7 +12,7 @@ resource "google_project_iam_member" "posts_sql_client" {
 # Create the function using the functions/posts.zip object.
 resource "google_cloudfunctions_function" "posts_delete_all" {
   name                  = "posts-delete-all-function"
-  region                = "europe-west1"
+  region                = var.region
   runtime               = "go116"
   service_account_email = google_service_account.posts.email
 

@@ -4,10 +4,10 @@ resource "google_compute_network" "vpc" {
   auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "default_ew4" {
+resource "google_compute_subnetwork" "default_ew1" {
   name                     = "${var.env}-default"
   ip_cidr_range            = "10.1.0.0/24"
-  region                   = "europe-west4"
+  region                   = "europe-west1"
   network                  = google_compute_network.vpc.id
   private_ip_google_access = true
 
@@ -66,7 +66,7 @@ resource "google_compute_firewall" "allow_internal_ingress" {
   priority  = 65534
 
   source_ranges = [
-    google_compute_subnetwork.default_ew4.ip_cidr_range,
+    google_compute_subnetwork.default_ew1.ip_cidr_range,
     google_compute_subnetwork.default_en1.ip_cidr_range
   ]
 
