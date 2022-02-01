@@ -1,4 +1,4 @@
-# Create the VPC network and subnet.
+# Create the VPC network and subnets.
 resource "google_compute_network" "vpc" {
   name                    = "${var.env}-vpc-network"
   auto_create_subnetworks = false
@@ -18,10 +18,10 @@ resource "google_compute_subnetwork" "default_ew1" {
   }
 }
 
-resource "google_compute_subnetwork" "default_en1" {
+resource "google_compute_subnetwork" "default_ew2" {
   name                     = "${var.env}-default"
   ip_cidr_range            = "10.2.0.0/24"
-  region                   = "europe-north1"
+  region                   = "europe-west2"
   network                  = google_compute_network.vpc.id
   private_ip_google_access = true
 
@@ -67,7 +67,7 @@ resource "google_compute_firewall" "allow_internal_ingress" {
 
   source_ranges = [
     google_compute_subnetwork.default_ew1.ip_cidr_range,
-    google_compute_subnetwork.default_en1.ip_cidr_range
+    google_compute_subnetwork.default_ew2.ip_cidr_range
   ]
 
   allow {
@@ -159,7 +159,7 @@ resource "google_compute_instance_template" "ghost" {
 
   network_interface {
     network    = google_compute_network.vpc.id
-    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew1.name : google_compute_subnetwork.default_en1.name
+    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew1.name : google_compute_subnetwork.default_ew2.name
   }
 
   lifecycle {

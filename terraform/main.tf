@@ -30,8 +30,8 @@ provider "google-beta" {
 }
 
 locals {
-  # Set the region suffix, ew4 for europe-west1, and en1 for europe-north1.
-  region_suffix = var.region == "europe-west1" ? "ew1" : "en1"
+  # Set the region suffix, ew4 for europe-west1, and en1 for europe-west2.
+  region_suffix = var.region == "europe-west1" ? "ew1" : "ew2"
 
   # Set the local domain variable for the SSL certificate, load balancer (header), and Ghost URL.
   domain = "${var.env}.${google_compute_global_address.ghost.address}.nip.io"

@@ -12,6 +12,7 @@ resource "google_sql_database_instance" "master" {
     backup_configuration {
       enabled            = true
       binary_log_enabled = true
+      location           = "europe-west4"
     }
 
     ip_configuration {
@@ -23,7 +24,7 @@ resource "google_sql_database_instance" "master" {
 resource "google_sql_database_instance" "replica" {
   name                 = "${var.env}-instance-replica-${random_id.suffix.hex}"
   database_version     = "MYSQL_8_0"
-  region               = "europe-north1"
+  region               = "europe-west2"
   deletion_protection  = false
   master_instance_name = google_sql_database_instance.master.name
 
