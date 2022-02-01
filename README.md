@@ -127,7 +127,7 @@ for api in "${apis[@]}"; do
 done
 ```
 
-**Step 3:** Create the storage buckets. The storage buckets are for the Terraform state separated per environment and the
+**Step 3:** Create the storage buckets. The storage buckets are used for the Terraform state separated per environment and the
 build artifacts.
 
 ```bash
@@ -249,4 +249,11 @@ with the option for manual invocation.
 
 ```bash
 gcloud beta builds triggers run test-ci --branch main
+```
+
+**Step 10:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests, 
+gcloud is used to call the function.
+
+```bash
+gcloud functions call test-posts-ew1-function-delete-all --region europe-west1
 ```
