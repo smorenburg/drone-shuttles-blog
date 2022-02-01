@@ -26,6 +26,7 @@ resource "google_storage_bucket" "functions" {
   location                    = "eu"
   force_destroy               = true
   uniform_bucket_level_access = true
+  # checkov:skip=CKV_GCP_62: Functions storage bucket, no need for additional logging.
 }
 
 resource "google_storage_bucket_object" "posts" {
