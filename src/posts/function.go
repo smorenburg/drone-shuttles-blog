@@ -139,7 +139,7 @@ func initTCPConnection() (*sql.DB, error) {
 }
 
 func configurePool(pool *sql.DB) {
-	pool.SetMaxIdleConns(5)
-	pool.SetMaxOpenConns(7)
+	pool.SetMaxIdleConns(2)
+	pool.SetMaxOpenConns(0)
 	pool.SetConnMaxLifetime(1800 * time.Second)
 }
