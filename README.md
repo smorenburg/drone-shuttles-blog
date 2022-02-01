@@ -108,7 +108,7 @@ the commands is using Cloud Shell, which is already authenticated.
 **Step 1:** Set the (local) environment variables. The project id and project number variables are used in some commands.
 
 ```bash
-export PROJECT_ID=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_ID)") && \ 
+export PROJECT_ID=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_ID)") && \
 export PROJECT_NUMBER=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_NUMBER)")
 ```
 
