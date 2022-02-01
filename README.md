@@ -108,17 +108,8 @@ the commands is using Cloud Shell, which is already authenticated.
 **Step 1:** Set the (local) environment variables. The project id and project number variables are used in some commands.
 
 ```bash
-export PROJECT_ID=$(
-  gcloud projects list \
-    --filter "$(gcloud config get-value project)" \
-    --format "value(PROJECT_ID)"
-)
- 
-export PROJECT_NUMBER=$(
-  gcloud projects list \
-    --filter "$(gcloud config get-value project)" \
-    --format "value(PROJECT_NUMBER)"
-)
+export PROJECT_ID=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_ID)") && \ 
+export PROJECT_NUMBER=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_NUMBER)")
 ```
 
 **Step 2:** Fork the smorenburg/drone-shuttle-blog GitHub repository. Forking the repository is needed because of the
@@ -153,8 +144,7 @@ apis=(
   compute.googleapis.com
   sqladmin.googleapis.com
   cloudfunctions.googleapis.com
-)
-
+) && \
 for api in "${apis[@]}"; do
   gcloud services enable "${api}" --async
 done
@@ -164,10 +154,10 @@ done
 and the build artifacts.
 
 ```bash
-gsutil mb -l eu -b on gs://${PROJECT_ID}-dev-tfstate
-gsutil mb -l eu -b on gs://${PROJECT_ID}-test-tfstate
-gsutil mb -l eu -b on gs://${PROJECT_ID}-stage-tfstate
-gsutil mb -l eu -b on gs://${PROJECT_ID}-prod-tfstate
+gsutil mb -l eu -b on gs://${PROJECT_ID}-dev-tfstate && \
+gsutil mb -l eu -b on gs://${PROJECT_ID}-test-tfstate && \
+gsutil mb -l eu -b on gs://${PROJECT_ID}-stage-tfstate && \
+gsutil mb -l eu -b on gs://${PROJECT_ID}-prod-tfstate && \
 gsutil mb -l eu -b on gs://${PROJECT_ID}-builds
 ```
 
@@ -175,17 +165,9 @@ gsutil mb -l eu -b on gs://${PROJECT_ID}-builds
 registry for the testing container images, and the `release` registry for the staging and production container images.
 
 ```bash
-gcloud artifacts repositories create dev \
-    --repository-format=docker \
-    --location=europe
-
-gcloud artifacts repositories create test \
-    --repository-format=docker \
-    --location=europe
-    
-gcloud artifacts repositories create release \
-    --repository-format=docker \
-    --location=europe 
+gcloud artifacts repositories create dev --repository-format=docker --location=europe && \
+gcloud artifacts repositories create test --repository-format=docker --location=europe && \
+gcloud artifacts repositories create release --repository-format=docker --location=europe
 ```
 
 **Step 7:** Delete the default firewall rules and network (if present). The new network conflicts with the default network.
@@ -220,8 +202,7 @@ roles=(
   roles/iam.serviceAccountAdmin
   roles/iam.serviceAccountUser
   roles/storage.admin
-)
-
+) && \
 for role in "${roles[@]}"; do
   gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
@@ -264,8 +245,7 @@ triggers=(
   prod/prod-cd.yaml
   prod/prod-plan-destroy.yaml
   prod/prod-destroy.yaml
-)
-
+) && \
 for trigger in "${triggers[@]}"; do
   gcloud beta builds triggers import --source "build/triggers/${trigger}"
 done
