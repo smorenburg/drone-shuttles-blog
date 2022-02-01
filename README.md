@@ -62,13 +62,13 @@ The uploaded content is placed in a storage bucket with multi-region availabilit
 
 By persisting the data and content the Ghost container is completely stateless.
 
+![Blog CI/CD](https://github.com/smorenburg/drone-shuttles-blog/blob/main/images/blog-cicd.png?raw=true)
+
 The deployment is completely automated by using Cloud Build, Artifact Registry, Terraform and Bash. 
 The CI/CD pipeline is seperated using multiple triggers and a combination a commit hashes and tags.
 The Terraform code and Dockerfile a checked by running Checkov during CI to make sure the best practices are included.
 And container scanning is enabled for the registry to scan for vulnerabilities. Every deployment needs manual approval which
 can be disabled.
-
-![Blog CI/CD](https://github.com/smorenburg/drone-shuttles-blog/blob/main/images/blog-cicd.png?raw=true)
 
 All the assigned permissions follow the principle of least privilege.
 
@@ -127,7 +127,7 @@ for api in "${apis[@]}"; do
 done
 ```
 
-**Step 3:** Create the storage buckets. The storage buckets are for the Terraform state separated per environment and the
+**Step 3:** Create the storage buckets. The storage buckets are used for the Terraform state separated per environment and the
 build artifacts.
 
 ```bash
@@ -249,4 +249,15 @@ with the option for manual invocation.
 
 ```bash
 gcloud beta builds triggers run test-ci --branch main
+```
+
+**Step 10:** Access the blog using the Terraform output. Terraform outputs two URLs: `ghost_url` and `ghost_url_no_cache`.
+During the deployment the SSL certificate is assigned to the load balancer. The provisioning of the certificate can take some time
+(20 minutes), during the provisioning the blog is not accessible (returns an SSL error).
+
+**Step 11:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests, 
+gcloud is used for the call.
+
+```bash
+gcloud functions call test-posts-ew1-function-delete-all --region europe-west1
 ```
