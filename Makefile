@@ -8,9 +8,6 @@ define TF_VARS
 endef
 
 define TF_IMPORTS
-terraform import $(TF_VARS) google_kms_key_ring.cluster_01 projects/$(PROJECT_ID)/locations/europe-west4/keyRings/cluster-01; \
-terraform import $(TF_VARS) google_kms_crypto_key.secrets projects/$(PROJECT_ID)/locations/europe-west4/keyRings/cluster-01/cryptoKeys/secrets; \
-terraform import $(TF_VARS) google_kms_crypto_key.observer projects/$(PROJECT_ID)/locations/europe-west4/keyRings/cluster-01/cryptoKeys/observer
 endef
 
 # Run checkov.
