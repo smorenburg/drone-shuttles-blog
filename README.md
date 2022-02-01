@@ -96,8 +96,7 @@ The table below displays the current cost estimate per environment per month. Th
 
 Before deploying the blog, there are some prerequisites to fulfill.
 
-**Project:** You need a GCP project with owner permissions
-(this is the default for new projects).
+**Project:** A GCP project with owner permissions (this is the default for new projects).
 
 **Billing account:** The project needs to be linked with an active billing account.
 
