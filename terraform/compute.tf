@@ -159,7 +159,7 @@ resource "google_compute_instance_template" "ghost" {
 
   network_interface {
     network    = google_compute_network.vpc.id
-    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew4.name : google_compute_subnetwork.default_en1.name
+    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew1.name : google_compute_subnetwork.default_en1.name
   }
 
   lifecycle {
