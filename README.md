@@ -53,7 +53,7 @@ nip.io domain and a CDN to accommodate large volumes of traffic and low latency 
 The data is persisted in a high-available replicated Cloud SQL instance running MySQL 8.0 using the Cloud SQL Auth Proxy,
 deployed as a container on the virtual machine instance. The Cloud SQL Auth proxy automatically encrypts traffic to and 
 from the database using TLS with a 128-bit AES cipher. The master instance is running in the europe-west1 region, 
-located in Belgium, whereas the replica instance is running in the europe-north1 region, located in Finland. 
+located in Belgium, whereas the replica instance is running in the europe-west2 region, located in the United Kingdom. 
 The database backups are stored in the europe-west4 region, located in The Netherlands, to accommodate multiple disaster 
 recovery scenarios.
 
@@ -64,7 +64,7 @@ The function to delete all the posts is deployed in europe-west1 and written in 
 
 Whenever there's a complete regional failure, the virtual machine instance and function can be deployed in the 
 europe-west2 region using the MySQL replica, which is read-only by default, with the option to promote the replica 
-instance to a single master instance for read-write operations. The subnet for europe-north1 is already present.
+instance to a single master instance for read-write operations. The subnet for europe-west2 is already present.
 
 ![CI/CD](https://github.com/smorenburg/drone-shuttles-blog/blob/main/images/cicd.png?raw=true)
 
@@ -294,7 +294,7 @@ gcloud functions call stage-posts-ew1-function-delete-all --region europe-west1
 ```
 
 **Step 15:** Destroy the blog in the testing and staging environment. Destroying is done through two destroy triggers.
-The first `env-destroy-plan` plans to destroy and triggers `env-destroy`, which requires manual approval.
+The first `env-plan-destroy` plans to destroy and triggers `env-destroy`, which destroys and requires manual approval.
 
 ```bash
 gcloud beta builds triggers run test-destroy-plan --branch main
