@@ -112,7 +112,7 @@ export PROJECT_ID=$(gcloud projects list --filter "$(gcloud config get-value pro
 export PROJECT_NUMBER=$(gcloud projects list --filter "$(gcloud config get-value project)" --format "value(PROJECT_NUMBER)")
 ```
 
-**Step 2:** Fork the smorenburg/drone-shuttle-blog GitHub repository. Forking the repository is needed because of the
+**Step 2:** Fork the smorenburg/drone-shuttle-blog GitHub repository. Forking the repository is required because of the
 permissions that the Cloud Build GitHub App needs for `Step 9`.
 
 **Step 3:** Clone the smorenburg/drone-shuttle-blog GitHub repository and move into the directory. Cloning the repository requires
