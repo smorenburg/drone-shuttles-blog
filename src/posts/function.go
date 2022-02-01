@@ -27,42 +27,34 @@ func DeleteAll(w http.ResponseWriter, _ *http.Request) {
 	db, _ := newClient()
 
 	// Truncate the post related tables.
-	err := db.truncateTables(t)
-	if err != nil {
-		_, _ = io.WriteString(w, "Something went wrong, check the logs\n")
-	} else {
-		_, _ = io.WriteString(w, "Deleted the all posts\n")
-	}
+	db.truncateTables(t)
 
+	_, _ = io.WriteString(w, "Deleted all the posts\n")
 	db.closeClient()
 }
 
-func (db *db) truncateTables(tables []string) error {
+func (db *db) truncateTables(tables []string) {
 	// Unset the foreign key checks.
-	_, err := db.client.Exec("SET FOREIGN_KEY_CHECKS=0;")
+	_, err := db.client.Exec("SET FOREIGN_KEY_CHECKS=0")
 	if err != nil {
-		log.Printf("DB.Exec: unable to unset foreign key checks: %s", err)
-		return err
+		log.Fatalf("DB.Exec: unable to unset foreign key checks: %s", err)
 	}
 
 	// Truncate the specified tables.
 	for _, v := range tables {
-		_, err = db.client.Exec(fmt.Sprintf("TRUNCATE TABLE %s;", v))
+		_, err = db.client.Exec(fmt.Sprintf("TRUNCATE TABLE %s", v))
 		if err != nil {
-			log.Printf("DB.Exec: unable to truncate table: %s", err)
-			return err
+			log.Fatalf("DB.Exec: unable to truncate table: %s", err)
 		}
 	}
 
 	// Set the foreign key checks.
-	_, err = db.client.Exec("SET FOREIGN_KEY_CHECKS=1;")
+	_, err = db.client.Exec("SET FOREIGN_KEY_CHECKS=1")
 	if err != nil {
 		log.Fatalf("DB.Exec: unable to set foreign key checks: %s", err)
-		return err
 	}
 
 	log.Printf("Deleted all the posts\n")
-	return nil
 }
 
 func newClient() (*db, error) {
@@ -77,14 +69,16 @@ func (db *db) connectClient() {
 
 	// Connect using TCP sockets if DB_HOSTNAME is set; otherwise, connect using Unix sockets.
 	if os.Getenv("DB_HOSTNAME") != "" {
-		db.client, err = initTCPConnectionPool()
+		db.client, err = initTCPConnection()
 		if err != nil {
-			log.Fatalf("initTCPConnectionPool: unable to connect: %v", err)
+			log.Fatalf("initTCPConnection: unable to connect: %v", err)
 		}
 	} else {
-		db.client, err = initSocketConnectionPool()
+		db.client, err = initSocketConnection()
 		if err != nil {
-			log.Fatalf("initSocketConnectionPool: unable to connect: %v", err)
+			if err != nil {
+				log.Fatalf("initSocketConnection: unable to connect: %v", err)
+			}
 		}
 	}
 }
@@ -97,15 +91,15 @@ func (db *db) closeClient() {
 func checkVar(k string) string {
 	v := os.Getenv(k)
 	if v == "" {
-		log.Fatalf("Warning: %s environment variable not set.\n", k)
+		log.Fatalf("Warning: %s environment variable not set\n", k)
 	}
 	return v
 }
 
-func initSocketConnectionPool() (*sql.DB, error) {
+func initSocketConnection() (*sql.DB, error) {
 	var (
 		user = checkVar("DB_USERNAME")
-		pwd  = checkVar("DB_PASSWORD")
+		pwd  = os.Getenv("DB_PASSWORD")
 		conn = checkVar("INSTANCE_CONNECTION_NAME")
 		dbn  = checkVar("DB_NAME")
 	)
@@ -121,14 +115,14 @@ func initSocketConnectionPool() (*sql.DB, error) {
 		return nil, fmt.Errorf("sql.Open: %v", err)
 	}
 
-	configureConnectionPool(pool)
+	configurePool(pool)
 	return pool, nil
 }
 
-func initTCPConnectionPool() (*sql.DB, error) {
+func initTCPConnection() (*sql.DB, error) {
 	var (
 		user = checkVar("DB_USERNAME")
-		pwd  = checkVar("DB_PASSWORD")
+		pwd  = os.Getenv("DB_PASSWORD")
 		host = checkVar("DB_HOSTNAME")
 		port = checkVar("DB_PORT")
 		dbn  = checkVar("DB_NAME")
@@ -140,12 +134,12 @@ func initTCPConnectionPool() (*sql.DB, error) {
 		return nil, fmt.Errorf("sql.Open: %v", err)
 	}
 
-	configureConnectionPool(pool)
+	configurePool(pool)
 	return pool, nil
 }
 
-func configureConnectionPool(pool *sql.DB) {
-	pool.SetMaxIdleConns(5)
-	pool.SetMaxOpenConns(7)
+func configurePool(pool *sql.DB) {
+	pool.SetMaxIdleConns(2)
+	pool.SetMaxOpenConns(0)
 	pool.SetConnMaxLifetime(1800 * time.Second)
 }

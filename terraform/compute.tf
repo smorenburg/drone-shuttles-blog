@@ -4,10 +4,10 @@ resource "google_compute_network" "vpc" {
   auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "default_ew4" {
+resource "google_compute_subnetwork" "default_ew1" {
   name                     = "${var.env}-default"
   ip_cidr_range            = "10.1.0.0/24"
-  region                   = "europe-west4"
+  region                   = "europe-west1"
   network                  = google_compute_network.vpc.id
   private_ip_google_access = true
 
@@ -66,7 +66,7 @@ resource "google_compute_firewall" "allow_internal_ingress" {
   priority  = 65534
 
   source_ranges = [
-    google_compute_subnetwork.default_ew4.ip_cidr_range,
+    google_compute_subnetwork.default_ew1.ip_cidr_range,
     google_compute_subnetwork.default_en1.ip_cidr_range
   ]
 
@@ -159,7 +159,7 @@ resource "google_compute_instance_template" "ghost" {
 
   network_interface {
     network    = google_compute_network.vpc.id
-    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew4.name : google_compute_subnetwork.default_en1.name
+    subnetwork = var.region == "europe-west4" ? google_compute_subnetwork.default_ew1.name : google_compute_subnetwork.default_en1.name
   }
 
   lifecycle {
@@ -190,9 +190,10 @@ resource "google_compute_instance_template" "ghost" {
 resource "google_compute_region_instance_group_manager" "ghost" {
   provider = google-beta
 
-  name               = "${var.env}-ghost-${local.region_suffix}-group"
-  base_instance_name = "${var.env}-ghost-${local.region_suffix}-instance"
-  target_size        = 1
+  name                      = "${var.env}-ghost-${local.region_suffix}-group"
+  base_instance_name        = "${var.env}-ghost-${local.region_suffix}-instance"
+  target_size               = 1
+  wait_for_instances_status = "STABLE"
 
   version {
     instance_template = google_compute_instance_template.ghost.id
@@ -209,7 +210,7 @@ resource "google_compute_region_instance_group_manager" "ghost" {
     minimal_action               = "REPLACE"
     max_surge_fixed              = 3
     max_unavailable_fixed        = 3
-    min_ready_sec                = 15
+    min_ready_sec                = 60
     replacement_method           = "SUBSTITUTE"
   }
 

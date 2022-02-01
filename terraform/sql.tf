@@ -2,7 +2,7 @@
 resource "google_sql_database_instance" "master" {
   name                = "${var.env}-instance-master-${random_id.suffix.hex}"
   database_version    = "MYSQL_8_0"
-  region              = "europe-west4"
+  region              = "europe-west1"
   deletion_protection = false
 
   settings {
@@ -54,5 +54,4 @@ resource "google_sql_user" "ghost" {
 resource "google_sql_user" "posts" {
   name     = "posts"
   instance = google_sql_database_instance.master.name
-  password = random_password.posts.result
 }
