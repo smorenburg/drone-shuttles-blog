@@ -22,14 +22,14 @@ resource "google_storage_bucket_iam_member" "ghost_object_creator" {
 
 # Create the functions storage bucket and upload object.
 resource "google_storage_bucket" "functions" {
-  name     = "${var.project_id}-${var.env}-functions"
+  name                        = "${var.project_id}-${var.env}-functions"
   location                    = "eu"
   force_destroy               = true
   uniform_bucket_level_access = true
 }
 
 resource "google_storage_bucket_object" "posts" {
-  name   = "2201311830_posts.zip"
+  name   = "${local.object_name}.zip"
   bucket = google_storage_bucket.functions.name
-  source = "./functions/2201311830_posts.zip"
+  source = "./functions/${local.object_name}.zip"
 }

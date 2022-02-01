@@ -36,6 +36,9 @@ locals {
   # Set the local domain variable for the SSL certificate, load balancer (header), and Ghost URL.
   domain = "${var.env}.${google_compute_global_address.ghost.address}.nip.io"
 
+  # Set the filename for the function object.
+  object_name = "2202010744_posts"
+
   # Render the cloud-init cloud-config YAML template using variables.
   cloud_config = templatefile("./templates/cloud-config.yaml", local.vars)
 
