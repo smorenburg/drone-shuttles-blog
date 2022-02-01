@@ -83,6 +83,15 @@ There are three SLOs and an uptime check configured:
 - 99% of the requests are below 500 ms latency
 - 99% of the requests are successful (availability)
 
+### Costs
+
+The table below displays the current cost estimate per environment per month. The costs can change based on usage.
+
+| Development     | Testing         | Staging         | Production      | Total           |
+|-----------------|-----------------|-----------------|-----------------|-----------------|
+| &euro; 100 p/mo | &euro; 100 p/mo | &euro; 170 p/mo | &euro; 170 p/mo | &euro; 540 p/mo |
+
+
 ## Prerequisites
 
 Before deploying the blog, there are some prerequisites to fulfill.
