@@ -36,47 +36,47 @@ static, so there should be very little traffic hitting your Ghost server with a 
 
 ![Architecture](https://github.com/smorenburg/drone-shuttles-blog/blob/main/images/architecture.png?raw=true)
 
-Ghost is deployed as a container on a single virtual machine instance running Container-Optimized OS, an operating 
+Ghost is deployed as a container on a single virtual machine instance running Container-Optimized OS, an operating
 system optimized for running containers. The virtual machine instance is configured using cloud-init.
 
-The virtual machine instance is deployed using a regional managed instance group that supports autohealing and 
-rolling updates. Whenever the current zone goes down, the instance is recreated in another zone, achieving regional 
-availability. Unfortunately, a zonal failure does include some downtime until the failed instance is recreated; 
+The virtual machine instance is deployed using a regional managed instance group that supports autohealing and
+rolling updates. Whenever the current zone goes down, the instance is recreated in another zone, achieving regional
+availability. Unfortunately, a zonal failure does include some downtime until the failed instance is recreated;
 the Ghost architecture doesn't support load-balanced clustering or multi-server setups.
 
 Whenever a new container image is created, the image is deployed using a rolling update mechanism. A second instance is
-created and will receive all traffic when healthy. The first instance is shut down and removed.
+created and will receive all traffic when healthy. The first instance is shut down and removed afterwords.
 
 The traffic is managed by a premium global HTTPS load balancer, including a managed SSL certificate using a (temporary)
 nip.io domain and a CDN to accommodate large volumes of traffic and low latency around the globe.
 
-The data is persisted in a high-available replicated Cloud SQL instance running MySQL 8.0 using the Cloud SQL Auth Proxy,
-deployed as a container on the virtual machine instance. The Cloud SQL Auth proxy automatically encrypts traffic to and 
-from the database using TLS with a 128-bit AES cipher. The master instance is running in the europe-west1 region, 
-located in Belgium, whereas the replica instance is running in the europe-west2 region, located in the United Kingdom. 
-The database backups are stored in the europe-west4 region, located in The Netherlands, to accommodate multiple disaster 
+The data is persisted in a regional high-available replicated Cloud SQL instance running MySQL 8.0 using the Cloud SQL Auth Proxy,
+deployed as a container on the virtual machine instance. The Cloud SQL Auth proxy automatically encrypts traffic to and
+from the database using TLS with a 128-bit AES cipher. The master instance is running in the europe-west1 region,
+located in Belgium, whereas the replica instance is running in the europe-west2 region, located in the United Kingdom.
+The database backups are stored in the europe-west4 region, located in The Netherlands, to accommodate multiple disaster
 recovery scenarios.
 
-The uploaded content is placed in a storage bucket with multi-region availability within Europe. By persisting the data 
-and content the Ghost container is entirely stateless.
+The uploaded content is placed in a storage bucket with multi-region availability within Europe. By persisting the data
+and content in a MySQL database and storage bucket the Ghost container is entirely stateless.
 
 The function to delete all the posts is deployed in europe-west1 and written in Go.
 
-Whenever there's a complete regional failure, the virtual machine instance and function can be deployed in the 
-europe-west2 region using the MySQL replica, which is read-only by default, with the option to promote the replica 
+Whenever there's a complete regional failure, the virtual machine instance and function can be deployed in the
+europe-west2 region using the MySQL replica, which is read-only by default, with the option to promote the replica
 instance to a single master instance for read-write operations. The subnet for europe-west2 is already present.
 
 ![CI/CD](https://github.com/smorenburg/drone-shuttles-blog/blob/main/images/cicd.png?raw=true)
 
 The deployment is automated using Cloud Build, Artifact Registry, Terraform, and Bash.
 The CI/CD pipeline is separated using multiple triggers and a combination of commit hashes and tags.
-The Terraform code and Dockerfile are checked by running Checkov during CI to ensure the best practices are included.
-And container scanning is enabled for the registry to scan for vulnerabilities. Every deployment needs manual approval, 
+The Terraform code and Dockerfile are checked by running Checkov during CI to ensure the best practices are followed.
+And container scanning is enabled for the registry to scan for vulnerabilities. Every deployment needs manual approval,
 which can be disabled.
 
 All the assigned permissions follow the principle of least privilege.
 
-The blog is designed for observability. All the metrics and logs are available through the Cloud Operations suite.
+The solution is designed for observability. All the metrics and logs are available through the Cloud Operations suite.
 There are three SLOs and an uptime check configured:
 
 - 90% of the request are below 250 ms latency
@@ -105,13 +105,34 @@ Before deploying the blog, there are some prerequisites to fulfill.
 The following steps are required to prepare the environment and get the blog up and running. The easiest way to execute
 the commands is using Cloud Shell, which is already authenticated.
 
-**Step 1:** Set the (local) environment variables. The project id variable is used in some commands.
+**Step 1:** Set the (local) environment variables. The project id and project number variables are used in some commands.
 
 ```bash
-export PROJECT_ID=<project_id>
+export PROJECT_ID=$(
+  gcloud projects list \
+    --filter "$(gcloud config get-value project)" \
+    --format "value(PROJECT_ID)"
+)
+ 
+export PROJECT_NUMBER=$(
+  gcloud projects list \
+    --filter "$(gcloud config get-value project)" \
+    --format "value(PROJECT_NUMBER)"
+)
 ```
 
-**Step 2:** Enable the APIs (services). The following APIs are enabled:
+**Step 2:** Fork the smorenburg/drone-shuttle-blog GitHub repository. Forking the repository is needed because of the
+permissions that the Cloud Build GitHub App needs for `Step 9`.
+
+**Step 3:** Clone the smorenburg/drone-shuttle-blog GitHub repository and move into the directory. Cloning the repository requires
+a GitHub username and a personal access token with `repo` permissions.
+
+```bash
+git clone https://github.com/smorenburg/drone-shuttles-blog.git && \
+cd drone-shuttles-blog
+```
+
+**Step 4:** Enable the APIs (services). The following APIs are enabled:
 
 - Cloud Resource Manager API
 - Identity and Access Management (IAM) API
@@ -139,7 +160,7 @@ for api in "${apis[@]}"; do
 done
 ```
 
-**Step 3:** Create the storage buckets. The storage buckets are used for the Terraform state separated per environment
+**Step 5:** Create the storage buckets. The storage buckets are used for the Terraform state separated per environment
 and the build artifacts.
 
 ```bash
@@ -150,8 +171,8 @@ gsutil mb -l eu -b on gs://${PROJECT_ID}-prod-tfstate
 gsutil mb -l eu -b on gs://${PROJECT_ID}-builds
 ```
 
-**Step 4:** Create the artifact registries. The 'dev' registry is for the development container images, the 'test'
-registry for the testing container images, and the 'release' registry for the staging and production container images.
+**Step 6:** Create the artifact registries. The `dev` registry is for the development container images, the `test`
+registry for the testing container images, and the `release` registry for the staging and production container images.
 
 ```bash
 gcloud artifacts repositories create dev \
@@ -167,14 +188,14 @@ gcloud artifacts repositories create release \
     --location=europe 
 ```
 
-**Step 5:** Delete the default firewall rules and network (if present). The new network conflicts with the default network.
+**Step 7:** Delete the default firewall rules and network (if present). The new network conflicts with the default network.
 
 ```bash
-gcloud compute firewall-rules delete default-allow-icmp default-allow-internal default-allow-rdp default-allow-ssh
+gcloud compute firewall-rules delete default-allow-icmp default-allow-internal default-allow-rdp default-allow-ssh && \
 gcloud compute networks delete default
 ```
 
-**Step 6:** Add the roles to the Cloud Build service account. The following roles are added:
+**Step 8:** Add the roles to the Cloud Build service account. The following roles are added:
 
 - Artifact Registry Writer
 - Cloud Functions Admin
@@ -188,12 +209,6 @@ gcloud compute networks delete default
 - Storage Admin
 
 ```bash
-export PROJECT_NUMBER=$(
-  gcloud projects list \
-    --filter "$(gcloud config get-value project)" \
-    --format "value(PROJECT_NUMBER)"
-)
-  
 roles=( 
   roles/artifactregistry.writer
   roles/cloudfunctions.admin
@@ -214,19 +229,18 @@ for role in "${roles[@]}"; do
 done
 ```
 
-**Step 7:** Add the source repository. This GitHub repository needs to be added to Cloud Build. Complete the following 
+**Step 9:** Add the source repository. This GitHub repository needs to be added to Cloud Build. Complete the following
 steps to connect to GitHub:
 
 1. Open the **Triggers** page in the Google Cloud Console.
-2. Select your project and click **Open**.
-3. Click **Connect Repository**.
-4. Select **GitHub (Cloud Build GitHub App)**.
-5. Click **Continue**.
-6. Authenticate to GitHub.
-7. Select the desired repository from the list of available repositories, then click **Connect**.
-8. Click **Done**.
+2. Click **Connect repository**.
+3. Select **GitHub (Cloud Build GitHub App)**.
+4. Click **Continue**.
+5. Authenticate to GitHub.
+6. Select the forked repository from the list of available repositories, then click **Connect**.
+7. Click **Done**.
 
-**Step 8:** Create the triggers. The triggers are created by importing the trigger YAML files located in `build/triggers`.
+**Step 10:** Create the triggers. The triggers are created by importing the trigger YAML files located in `build/triggers`.
 The triggers use the configs located in `build/configs`.
 
 ```bash
@@ -257,49 +271,49 @@ for trigger in "${triggers[@]}"; do
 done
 ```
 
-**Step 9:** Deploy the blog to the testing environment. The `test-ci` trigger is triggered on changes to the main branch,
+**Step 11:** Deploy the blog to the testing environment. The `test-ci` trigger is triggered on changes to the main branch,
 with the option for manual invocation. The last trigger, `test-cd`, requires manual approval.
 
 ```bash
 gcloud beta builds triggers run test-ci --branch main
 ```
 
-**Step 10:** Access the blog using the Terraform output. Terraform outputs two URLs: `ghost_url` and `ghost_url_no_cache`.
-During the deployment, the SSL certificate is assigned to the load balancer. The provisioning of the certificate can 
+**Step 12:** Access the blog using the Terraform output. Terraform outputs two URLs: `ghost_url` and `ghost_url_no_cache`.
+During the deployment, the SSL certificate is assigned to the load balancer. The provisioning of the certificate can
 take some time (20 minutes), during the provisioning, the blog is not accessible (returns an SSL error).
 
-**Step 11:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests,
+**Step 13:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests,
 gcloud is used for the call.
 
 ```bash
 gcloud functions call test-posts-ew1-function-delete-all --region europe-west1
 ```
 
-**Step 12:** Deploy version 1.0.0 to the staging environment. The `release-ci` trigger is triggered on new tags,
+**Step 14:** Deploy version 1.0.0 to the staging environment. The `release-ci` trigger is triggered on new tags,
 with manual invocation options. The last trigger, `stage-cd`, requires manual approval.
 
 ```bash
 gcloud beta builds triggers run release-ci --tag 1.0.0
 ```
 
-**Step 13:** Access the blog using the Terraform output. Terraform outputs two URLs: `ghost_url` and `ghost_url_no_cache`.
-During the deployment, the SSL certificate is assigned to the load balancer. The provisioning of the certificate can 
+**Step 15:** Access the blog using the Terraform output. Terraform outputs two URLs: `ghost_url` and `ghost_url_no_cache`.
+During the deployment, the SSL certificate is assigned to the load balancer. The provisioning of the certificate can
 take some time (20 minutes), during the provisioning, the blog is not accessible (returns an SSL error).
 
-**Step 14:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests,
+**Step 16:** Call the function to delete all the posts. Because the function only accepts authenticated HTTP requests,
 gcloud is used for the call.
 
 ```bash
 gcloud functions call stage-posts-ew1-function-delete-all --region europe-west1
 ```
 
-**Step 15:** Destroy the blog in the testing and staging environment. Destroying is done through two destroy triggers.
+**Step 17:** Destroy the blog in the testing and staging environment. Destroying is done through two destroy triggers.
 The first `env-plan-destroy` plans to destroy and triggers `env-destroy`, which destroys and requires manual approval.
 
 ```bash
-gcloud beta builds triggers run test-destroy-plan --branch main
+gcloud beta builds triggers run test-plan-destroy --branch main
 ```
 
 ```bash
-gcloud beta builds triggers run stage-destroy-plan --tag 1.0.0
+gcloud beta builds triggers run stage-plan-destroy --tag 1.0.0
 ```
