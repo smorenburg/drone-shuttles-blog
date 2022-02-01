@@ -45,7 +45,7 @@ availability. Unfortunately, a zonal failure does include some downtime until th
 the Ghost architecture doesn't support load-balanced clustering or multi-server setups.
 
 Whenever a new container image is created, the image is deployed using a rolling update mechanism. A second instance is
-created and will receive all traffic when healthy. The first instance is shut down and removed afterwords.
+created and will receive all traffic when healthy. The first instance is shut down and removed.
 
 The traffic is managed by a premium global HTTPS load balancer, including a managed SSL certificate using a (temporary)
 nip.io domain and a CDN to accommodate large volumes of traffic and low latency around the globe.
@@ -58,7 +58,7 @@ The database backups are stored in the europe-west4 region, located in The Nethe
 recovery scenarios.
 
 The uploaded content is placed in a storage bucket with multi-region availability within Europe. By persisting the data
-and content in a MySQL database and storage bucket the Ghost container is entirely stateless.
+and content in a MySQL database and storage bucket, the Ghost container is entirely stateless.
 
 The function to delete all the posts is deployed in europe-west1 and written in Go.
 
