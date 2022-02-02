@@ -71,7 +71,7 @@ instance to a single master instance for read-write operations. The subnet for e
 The deployment is automated using Cloud Build, Artifact Registry, Terraform, and Bash.
 The CI/CD pipeline is separated using multiple triggers and a combination of commit hashes and tags.
 The Terraform code and Dockerfile are checked by running Checkov during CI to ensure the best practices are followed.
-And container scanning is enabled for the registry to scan for vulnerabilities. Every deployment needs manual approval,
+And container scanning is enabled for the registries to scan for vulnerabilities. Every deployment needs manual approval,
 which can be disabled.
 
 All the assigned permissions follow the principle of least privilege.
