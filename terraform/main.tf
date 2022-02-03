@@ -30,7 +30,7 @@ provider "google-beta" {
 }
 
 locals {
-  # Set the region suffix, ew4 for europe-west1, and en1 for europe-west2.
+  # Set the region suffix, ew1 for europe-west1, and ew2 for europe-west2.
   region_suffix = var.region == "europe-west1" ? "ew1" : "ew2"
 
   # Set the local domain variable for the SSL certificate, load balancer (header), and Ghost URL.
